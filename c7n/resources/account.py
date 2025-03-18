@@ -210,8 +210,7 @@ class MacieEnabled(ValueFilter):
             info['master'] = {}
         else:
             info['administrator'] = minfo
-            info['master'] = info['administrator']
-            info['administrator'] = info['master']
+        info['administrator'] = info['master']
         account[self.annotation_key] = info
 
 
