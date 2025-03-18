@@ -207,8 +207,10 @@ class MacieEnabled(ValueFilter):
         except (client.exceptions.AccessDeniedException,
                 client.exceptions.ResourceNotFoundException):
             info['administrator'] = {}
+            info['master'] = {}
         else:
             info['administrator'] = minfo
+            info['master'] = info['administrator']
         account[self.annotation_key] = info
 
 

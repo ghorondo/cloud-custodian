@@ -46,6 +46,7 @@ class AccountTests(BaseTest):
                 2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
             'findingPublishingFrequency': 'FIFTEEN_MINUTES',
             'administrator': {},
+            'master': {},
             'serviceRole': ('arn:aws:iam::{}:role/aws-service-role/'
                             'macie.amazonaws.com/'
                             'AWSServiceRoleForAmazonMacie').format(
