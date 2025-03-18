@@ -211,6 +211,7 @@ class MacieEnabled(ValueFilter):
         else:
             info['administrator'] = minfo
             info['master'] = info['administrator']
+            info['administrator'] = info['master']
         account[self.annotation_key] = info
 
 
