@@ -1,8 +1,0 @@
-2025-04-03 02:27:28,973 - custodian.policy - INFO - policy:comprehend-entity-recognizers-require-vpc resource:comprehend-entity-recognizer region:us-east-1 count:0 time:0.45
-2025-04-03 02:29:18,790 - custodian.policy - INFO - policy:comprehend-entity-recognizers-require-vpc resource:comprehend-entity-recognizer region:us-east-1 count:2 time:0.00
-2025-04-03 02:42:51,754 - custodian.policy - INFO - policy:comprehend-entity-recognizers-require-vpc resource:comprehend-entity-recognizer region:us-east-1 count:2 time:0.32
-2025-04-03 03:10:56,517 - custodian.policy - INFO - policy:comprehend-entity-recognizers-require-vpc resource:comprehend-entity-recognizer region:us-east-1 count:2 time:0.43
-2025-04-03 03:13:10,092 - custodian.policy - INFO - policy:comprehend-entity-recognizers-require-vpc resource:comprehend-entity-recognizer region:us-east-1 count:2 time:0.00
-2025-04-03 04:22:13,442 - custodian.policy - INFO - policy:comprehend-entity-recognizers-require-vpc resource:comprehend-endpoint region:us-east-1 count:0 time:0.15
-2025-04-03 04:22:29,667 - custodian.policy - INFO - policy:comprehend-entity-recognizers-require-vpc resource:comprehend-endpoint region:us-east-1 count:0 time:0.00
-2025-04-03 04:22:59,467 - custodian.policy - INFO - policy:comprehend-entity-recognizers-require-vpc resource:comprehend-entity-recognizer region:us-east-1 count:2 time:0.41
