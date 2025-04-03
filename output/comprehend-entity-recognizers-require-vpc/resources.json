@@ -1,0 +1,192 @@
+[
+  {
+    "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/1",
+    "LanguageCode": "en",
+    "Status": "IN_ERROR",
+    "Message": "NOT_ENOUGH_ACCESS_TO_VPC: The provided data access role does not have ec2:DescribeSecurityGroups permission.",
+    "SubmitTime": "2025-04-02T16:39:15.435000-04:00",
+    "EndTime": "2025-04-02T16:39:50.114000-04:00",
+    "InputDataConfig": {
+      "DataFormat": "COMPREHEND_CSV",
+      "EntityTypes": [
+        {
+          "Type": "PERSON"
+        },
+        {
+          "Type": "ORGANIZATION"
+        },
+        {
+          "Type": "LOCATION"
+        },
+        {
+          "Type": "EMAIL"
+        },
+        {
+          "Type": "PHONE_NUMBER"
+        }
+      ],
+      "Documents": {
+        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+        "InputFormat": "ONE_DOC_PER_LINE"
+      },
+      "Annotations": {
+        "S3Uri": "s3://c7n-test-s3-bucket/entities.csv"
+      }
+    },
+    "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+    "VpcConfig": {
+      "SecurityGroupIds": [
+        "sg-0d74b07ab0b3288c0"
+      ],
+      "Subnets": [
+        "subnet-0ebe9abf587c5070c"
+      ]
+    },
+    "VersionName": "1",
+    "EntityRecognizerProperties": {
+      "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/1",
+      "LanguageCode": "en",
+      "Status": "IN_ERROR",
+      "Message": "NOT_ENOUGH_ACCESS_TO_VPC: The provided data access role does not have ec2:DescribeSecurityGroups permission.",
+      "SubmitTime": "2025-04-02T16:39:15.435000-04:00",
+      "EndTime": "2025-04-02T16:39:50.114000-04:00",
+      "InputDataConfig": {
+        "DataFormat": "COMPREHEND_CSV",
+        "EntityTypes": [
+          {
+            "Type": "PERSON"
+          },
+          {
+            "Type": "ORGANIZATION"
+          },
+          {
+            "Type": "LOCATION"
+          },
+          {
+            "Type": "EMAIL"
+          },
+          {
+            "Type": "PHONE_NUMBER"
+          }
+        ],
+        "Documents": {
+          "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+          "InputFormat": "ONE_DOC_PER_LINE"
+        },
+        "Annotations": {
+          "S3Uri": "s3://c7n-test-s3-bucket/entities.csv"
+        }
+      },
+      "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+      "VpcConfig": {
+        "SecurityGroupIds": [
+          "sg-0d74b07ab0b3288c0"
+        ],
+        "Subnets": [
+          "subnet-0ebe9abf587c5070c"
+        ]
+      },
+      "VersionName": "1"
+    },
+    "Tags": [],
+    "c7n:MatchedFilters": [
+      "VpcConfig"
+    ]
+  },
+  {
+    "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/2",
+    "LanguageCode": "en",
+    "Status": "IN_ERROR",
+    "Message": "NOT_ENOUGH_ACCESS_TO_VPC: The provided data access role does not have at least one of permissions required for Vpc access. Please check documentation.",
+    "SubmitTime": "2025-04-03T02:05:28.386000-04:00",
+    "EndTime": "2025-04-03T02:14:27.167000-04:00",
+    "TrainingEndTime": "2025-04-03T02:12:56.290000-04:00",
+    "InputDataConfig": {
+      "DataFormat": "COMPREHEND_CSV",
+      "EntityTypes": [
+        {
+          "Type": "PERSON"
+        },
+        {
+          "Type": "ORGANIZATION"
+        },
+        {
+          "Type": "LOCATION"
+        },
+        {
+          "Type": "EMAIL"
+        },
+        {
+          "Type": "PHONE_NUMBER"
+        }
+      ],
+      "Documents": {
+        "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+        "InputFormat": "ONE_DOC_PER_LINE"
+      },
+      "Annotations": {
+        "S3Uri": "s3://c7n-test-s3-bucket/entities.csv"
+      }
+    },
+    "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+    "VpcConfig": {
+      "SecurityGroupIds": [
+        "sg-0d74b07ab0b3288c0"
+      ],
+      "Subnets": [
+        "subnet-0ebe9abf587c5070c"
+      ]
+    },
+    "VersionName": "2",
+    "EntityRecognizerProperties": {
+      "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/2",
+      "LanguageCode": "en",
+      "Status": "IN_ERROR",
+      "Message": "NOT_ENOUGH_ACCESS_TO_VPC: The provided data access role does not have at least one of permissions required for Vpc access. Please check documentation.",
+      "SubmitTime": "2025-04-03T02:05:28.386000-04:00",
+      "EndTime": "2025-04-03T02:14:27.167000-04:00",
+      "TrainingEndTime": "2025-04-03T02:12:56.290000-04:00",
+      "InputDataConfig": {
+        "DataFormat": "COMPREHEND_CSV",
+        "EntityTypes": [
+          {
+            "Type": "PERSON"
+          },
+          {
+            "Type": "ORGANIZATION"
+          },
+          {
+            "Type": "LOCATION"
+          },
+          {
+            "Type": "EMAIL"
+          },
+          {
+            "Type": "PHONE_NUMBER"
+          }
+        ],
+        "Documents": {
+          "S3Uri": "s3://c7n-test-s3-bucket/sample.txt",
+          "InputFormat": "ONE_DOC_PER_LINE"
+        },
+        "Annotations": {
+          "S3Uri": "s3://c7n-test-s3-bucket/entities.csv"
+        }
+      },
+      "DataAccessRoleArn": "arn:aws:iam::644160558196:role/ComprehendVpcAccessRole",
+      "VpcConfig": {
+        "SecurityGroupIds": [
+          "sg-0d74b07ab0b3288c0"
+        ],
+        "Subnets": [
+          "subnet-0ebe9abf587c5070c"
+        ]
+      },
+      "VersionName": "2"
+    },
+    "Tags": [],
+    "c7n:MatchedFilters": [
+      "VpcConfig"
+    ]
+  }
+]
