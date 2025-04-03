@@ -5,15 +5,13 @@ from .common import BaseTest
 
 class TestComprehendEndpoint(BaseTest):
 
-       def test_comprehend_endpoint_vpc(self):
+    def test_comprehend_endpoint_vpc(self):
         session_factory = self.replay_flight_data("test_comprehend_endpoint_vpc")
         p = self.load_policy(
             {
-                "name": "list-comprehend-endpoints", 
+                "name": "list-comprehend-endpoints",
                 "resource": "comprehend-endpoint",
-                "filters": [
-                    {"type": "value", "key": "VpcConfig", "value": "present"}
-                ],
+                "filters": [{"type": "value", "key": "VpcConfig", "value": "present"}],
             },
             session_factory=session_factory,
         )
@@ -28,11 +26,9 @@ class TestComprehendEntityRecognizer(BaseTest):
         session_factory = self.replay_flight_data("test_comprehend_entity_recognizer_vpc")
         p = self.load_policy(
             {
-                "name": "list-comprehend-recognizers", 
+                "name": "list-comprehend-recognizers",
                 "resource": "comprehend-entity-recognizer",
-                "filters": [
-                    {"type": "value", "key": "VpcConfig", "value": "present"}
-                ],
+                "filters": [{"type": "value", "key": "VpcConfig", "value": "present"}],
             },
             session_factory=session_factory,
         )
@@ -50,9 +46,7 @@ class TestComprehendDocumentClassifier(BaseTest):
             {
                 "name": "comprehend-document-classifier-vpc",
                 "resource": "comprehend-document-classifier",
-                "filters": [
-                    {"type": "value", "key": "VpcConfig", "value": "present"}
-                ],
+                "filters": [{"type": "value", "key": "VpcConfig", "value": "present"}],
             },
             session_factory=session_factory,
         )
@@ -62,15 +56,13 @@ class TestComprehendDocumentClassifier(BaseTest):
 
 
 class TestComprehendFlywheel(BaseTest):
-       def test_comprehend_flywheel_vpc(self):
+    def test_comprehend_flywheel_vpc(self):
         session_factory = self.replay_flight_data("test_comprehend_flywheel_vpc")
         p = self.load_policy(
             {
-                "name": "list-comprehend-flywheels", 
+                "name": "list-comprehend-flywheels",
                 "resource": "comprehend-flywheel",
-                "filters": [
-                    {"type": "value", "key": "VpcConfig", "value": "present"}
-                ],
+                "filters": [{"type": "value", "key": "VpcConfig", "value": "present"}],
             },
             session_factory=session_factory,
         )
