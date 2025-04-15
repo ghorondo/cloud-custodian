@@ -5,7 +5,7 @@ class ComprehendEndpointTests(BaseTest):
 
     def test_comprehend_endpoint_tag_untag(self):
         session_factory = self.replay_flight_data("test_comprehend_endpoint_tag_untag")
-        
+
         p = self.load_policy(
             {
                 "name": "comprehend-endpoint-tags-find",
@@ -16,12 +16,12 @@ class ComprehendEndpointTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
         client = session_factory().client("comprehend")
         arn = resources[0]["EndpointArn"]
-        
+
         client.untag_resource(ResourceArn=arn, TagKeys=["ASV"])
-        
+
         p_after = self.load_policy(
             {
                 "name": "comprehend-endpoint-tags-after",
@@ -52,7 +52,7 @@ class ComprehendEntityRecognizerTests(BaseTest):
 
     def test_comprehend_entity_recognizer_tag_untag(self):
         session_factory = self.replay_flight_data("test_comprehend_entity_recognizer_tag_untag")
-        
+
         p = self.load_policy(
             {
                 "name": "find-tagged-entity-recognizer",
@@ -62,12 +62,12 @@ class ComprehendEntityRecognizerTests(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        
+
         if not resources:
             self.skipTest("No entity recognizers found with tag ASV=PolicyTestASV")
-        
+
         self.assertEqual(len(resources), 1, "Should find one resource with the tag")
-        
+
         p = self.load_policy(
             {
                 "name": "untag-entity-recognizer",
@@ -78,7 +78,7 @@ class ComprehendEntityRecognizerTests(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        
+
         client = session_factory().client("comprehend")
         arn = resources[0]["EntityRecognizerArn"]
         tags = client.list_tags_for_resource(ResourceArn=arn)
@@ -116,7 +116,7 @@ class ComprehendDocumentClassifierTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue('VpcConfig' in resources[0])
-        
+
     def test_comprehend_document_classifier_cross_account(self):
         factory = self.replay_flight_data("test_comprehend_document_classifier_cross_account")
         p = self.load_policy(
@@ -129,7 +129,7 @@ class ComprehendDocumentClassifierTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-      
+
     def test_comprehend_document_classifier_tag_untag(self):
         session_factory = self.replay_flight_data("test_comprehend_document_classifier_tag_untag")
         p = self.load_policy(
@@ -154,9 +154,15 @@ class ComprehendFlywheelTests(BaseTest):
         session_factory = self.replay_flight_data("test_comprehend_flywheel_vpc")
         p = self.load_policy(
             {
-                "name": "list-comprehend-flywheels",
-                "resource": "comprehend-flywheel",
-                "filters": [{"type": "value", "key": "DataSecurityConfig.VpcConfig", "value": "present"}]            },
+            "name": "list-comprehend-flywheels",
+            "resource": "comprehend-flywheel",
+            "filters": [
+            {
+                "type": "value",
+                "key": "DataSecurityConfig.VpcConfig",
+                "value": "present"
+            }
+        ], },
             session_factory=session_factory,
         )
         resources = p.run()
@@ -164,7 +170,7 @@ class ComprehendFlywheelTests(BaseTest):
         self.assertTrue('FlywheelArn' in resources[0])
         self.assertTrue('DataSecurityConfig' in resources[0])
         self.assertTrue('VpcConfig' in resources[0]['DataSecurityConfig'])
-        
+
     def test_comprehend_flywheel_tag_untag(self):
         session_factory = self.replay_flight_data("test_comprehend_flywheel_tag_untag")
         p = self.load_policy(

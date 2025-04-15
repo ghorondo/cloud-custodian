@@ -5,8 +5,9 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
 from c7n.filters import CrossAccountAccessFilter
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session
 import json
+
 
 class ComprehendEndpointDescribe(DescribeSource):
     def augment(self, resources):
@@ -76,7 +77,7 @@ class ComprehendFlywheel(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'comprehend'
         enum_spec = ('list_flywheels', 'FlywheelSummaryList', None)
-        detail_spec = ('describe_flywheel', 'FlywheelArn', 'FlywheelArn','FlywheelProperties')
+        detail_spec = ('describe_flywheel', 'FlywheelArn', 'FlywheelArn', 'FlywheelProperties')
         arn = id = 'FlywheelArn'
         name = 'FlywheelArn'
         date = 'LastModifiedTime'
@@ -89,11 +90,11 @@ class ComprehendFlywheel(QueryResourceManager):
 @ComprehendDocumentClassifier.filter_registry.register('cross-account')
 class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
     """Filter Comprehend custom models if they have cross-account access to non-Capital One accounts
-    
+
     :example:
-    
+
     .. code-block:: yaml
-    
+
       policies:
         - name: comprehend-model-cross-account
           resource: aws.comprehend-entity-recognizer
@@ -110,12 +111,12 @@ class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
         client = local_session(self.manager.session_factory).client('comprehend')
         if self.policy_annotation in r:
             return r[self.policy_annotation]
-            
+
         arn = r.get('EntityRecognizerArn') or r.get('DocumentClassifierArn')
         try:
             result = client.describe_resource_policy(ResourceArn=arn)
             policy_str = result.get('ResourcePolicy')
-            
+
             if isinstance(policy_str, str):
                 try:
                     policy = json.loads(policy_str)
@@ -123,9 +124,9 @@ class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
                     policy = {}
             else:
                 policy = policy_str or {}
-                
+
         except client.exceptions.ResourceNotFoundException:
             policy = {}
-            
+
         r[self.policy_annotation] = policy
         return policy
