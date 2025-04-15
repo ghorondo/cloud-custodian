@@ -89,21 +89,6 @@ class ComprehendFlywheel(QueryResourceManager):
 @ComprehendEntityRecognizer.filter_registry.register('cross-account')
 @ComprehendDocumentClassifier.filter_registry.register('cross-account')
 class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
-    """Filter Comprehend custom models if they have cross-account access to non-Capital One accounts
-
-    :example:
-
-    .. code-block:: yaml
-
-      policies:
-        - name: comprehend-model-cross-account
-          resource: aws.comprehend-entity-recognizer
-          filters:
-            - type: cross-account
-              whitelist_from:
-                expr: "accounts.*.accountNumber"
-                url: "file://path/to/accounts.json"
-    """
     permissions = ('comprehend:DescribeResourcePolicy',)
     policy_annotation = "c7n:AccessPolicy"
 
