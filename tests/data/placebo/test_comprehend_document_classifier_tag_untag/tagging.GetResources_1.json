@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:flywheel/TestFlywheelVPC",
+                "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:document-classifier/TestModelVPC",
                 "Tags": [
                     {
                         "Key": "ASV",

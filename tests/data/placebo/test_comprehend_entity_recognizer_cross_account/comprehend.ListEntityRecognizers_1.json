@@ -5,7 +5,8 @@
             {
                 "EntityRecognizerArn": "arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/12",
                 "LanguageCode": "en",
-                "Status": "TRAINING",
+                "Status": "IN_ERROR",
+                "Message": "Validate user metadata failed.\n, exit code: 255",
                 "SubmitTime": {
                     "__class__": "datetime",
                     "year": 2025,
@@ -15,6 +16,36 @@
                     "minute": 45,
                     "second": 19,
                     "microsecond": 46000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 11,
+                    "minute": 56,
+                    "second": 11,
+                    "microsecond": 946000
+                },
+                "TrainingStartTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 11,
+                    "minute": 52,
+                    "second": 59,
+                    "microsecond": 120000
+                },
+                "TrainingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2025,
+                    "month": 4,
+                    "day": 15,
+                    "hour": 11,
+                    "minute": 55,
+                    "second": 39,
+                    "microsecond": 354000
                 },
                 "InputDataConfig": {
                     "DataFormat": "COMPREHEND_CSV",

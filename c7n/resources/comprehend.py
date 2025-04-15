@@ -4,6 +4,13 @@
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
+from c7n.filters import CrossAccountAccessFilter
+from c7n.utils import local_session, type_schema
+import json
+
+class ComprehendEndpointDescribe(DescribeSource):
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('comprehend-endpoint')
@@ -12,16 +19,15 @@ class ComprehendEndpoint(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'comprehend'
         enum_spec = ('list_endpoints', 'EndpointPropertiesList', None)
-        detail_spec = ('describe_endpoint', 'EndpointArn', 'EndpointArn', None)
         arn = id = 'EndpointArn'
         name = 'EndpointArn'
         date = 'CreationTime'
-        permission_prefix = 'comprehend'
         universal_taggable = object()
+
+    source_mapping = {'describe': ComprehendEndpointDescribe}
 
 
 class ComprehendEntityRecognizerDescribe(DescribeSource):
-
     def augment(self, resources):
         return universal_augment(self.manager, super().augment(resources))
 
@@ -32,23 +38,15 @@ class ComprehendEntityRecognizer(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'comprehend'
         enum_spec = ('list_entity_recognizers', 'EntityRecognizerPropertiesList', None)
-        detail_spec = (
-            'describe_entity_recognizer',
-            'EntityRecognizerArn',
-            'EntityRecognizerArn',
-            None,
-        )
         arn = id = 'EntityRecognizerArn'
         name = 'EntityRecognizerArn'
         date = 'SubmitTime'
-        permission_prefix = 'comprehend'
         universal_taggable = object()
 
     source_mapping = {'describe': ComprehendEntityRecognizerDescribe}
 
 
 class ComprehendDocumentClassifierDescribe(DescribeSource):
-
     def augment(self, resources):
         return universal_augment(self.manager, super().augment(resources))
 
@@ -59,23 +57,15 @@ class ComprehendDocumentClassifier(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'comprehend'
         enum_spec = ('list_document_classifiers', 'DocumentClassifierPropertiesList', None)
-        detail_spec = (
-            'describe_document_classifier',
-            'DocumentClassifierArn',
-            'DocumentClassifierArn',
-            None,
-        )
         arn = id = 'DocumentClassifierArn'
         name = 'DocumentClassifierArn'
         date = 'SubmitTime'
-        permission_prefix = 'comprehend'
         universal_taggable = object()
 
     source_mapping = {'describe': ComprehendDocumentClassifierDescribe}
 
 
 class ComprehendFlywheelDescribe(DescribeSource):
-
     def augment(self, resources):
         return universal_augment(self.manager, super().augment(resources))
 
@@ -86,11 +76,56 @@ class ComprehendFlywheel(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'comprehend'
         enum_spec = ('list_flywheels', 'FlywheelSummaryList', None)
-        detail_spec = ('describe_flywheel', 'FlywheelArn', 'FlywheelArn', None)
+        detail_spec = ('describe_flywheel', 'FlywheelArn', 'FlywheelArn','FlywheelProperties')
         arn = id = 'FlywheelArn'
         name = 'FlywheelArn'
-        date = 'CreationTime'
-        permission_prefix = 'comprehend'
+        date = 'LastModifiedTime'
         universal_taggable = object()
 
     source_mapping = {'describe': ComprehendFlywheelDescribe}
+
+
+@ComprehendEntityRecognizer.filter_registry.register('cross-account')
+@ComprehendDocumentClassifier.filter_registry.register('cross-account')
+class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
+    """Filter Comprehend custom models if they have cross-account access to non-Capital One accounts
+    
+    :example:
+    
+    .. code-block:: yaml
+    
+      policies:
+        - name: comprehend-model-cross-account
+          resource: aws.comprehend-entity-recognizer
+          filters:
+            - type: cross-account
+              whitelist_from:
+                expr: "accounts.*.accountNumber"
+                url: "file://path/to/accounts.json"
+    """
+    permissions = ('comprehend:DescribeResourcePolicy',)
+    policy_annotation = "c7n:AccessPolicy"
+
+    def get_resource_policy(self, r):
+        client = local_session(self.manager.session_factory).client('comprehend')
+        if self.policy_annotation in r:
+            return r[self.policy_annotation]
+            
+        arn = r.get('EntityRecognizerArn') or r.get('DocumentClassifierArn')
+        try:
+            result = client.describe_resource_policy(ResourceArn=arn)
+            policy_str = result.get('ResourcePolicy')
+            
+            if isinstance(policy_str, str):
+                try:
+                    policy = json.loads(policy_str)
+                except json.JSONDecodeError:
+                    policy = {}
+            else:
+                policy = policy_str or {}
+                
+        except client.exceptions.ResourceNotFoundException:
+            policy = {}
+            
+        r[self.policy_annotation] = policy
+        return policy
