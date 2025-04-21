@@ -1,17 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
-from c7n.tags import universal_augment
+from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags
 from c7n.filters import CrossAccountAccessFilter
 from c7n.utils import local_session
 import json
-
-
-class ComprehendEndpointDescribe(DescribeSource):
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('comprehend-endpoint')
@@ -25,12 +18,8 @@ class ComprehendEndpoint(QueryResourceManager):
         date = 'CreationTime'
         universal_taggable = object()
 
-    source_mapping = {'describe': ComprehendEndpointDescribe}
-
-
-class ComprehendEntityRecognizerDescribe(DescribeSource):
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
+    permissions = ('comprehend:ListEndpoints',)
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @resources.register('comprehend-entity-recognizer')
@@ -44,12 +33,8 @@ class ComprehendEntityRecognizer(QueryResourceManager):
         date = 'SubmitTime'
         universal_taggable = object()
 
-    source_mapping = {'describe': ComprehendEntityRecognizerDescribe}
-
-
-class ComprehendDocumentClassifierDescribe(DescribeSource):
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
+    permissions = ('comprehend:ListEntityRecognizers',)
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @resources.register('comprehend-document-classifier')
@@ -63,12 +48,8 @@ class ComprehendDocumentClassifier(QueryResourceManager):
         date = 'SubmitTime'
         universal_taggable = object()
 
-    source_mapping = {'describe': ComprehendDocumentClassifierDescribe}
-
-
-class ComprehendFlywheelDescribe(DescribeSource):
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
+    permissions = ('comprehend:ListDocumentClassifiers',)
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @resources.register('comprehend-flywheel')
@@ -83,7 +64,8 @@ class ComprehendFlywheel(QueryResourceManager):
         date = 'LastModifiedTime'
         universal_taggable = object()
 
-    source_mapping = {'describe': ComprehendFlywheelDescribe}
+    permissions = ('comprehend:ListFlywheels', 'comprehend:DescribeFlywheel')
+    source_mapping = {'describe': DescribeWithResourceTags}
 
 
 @ComprehendEntityRecognizer.filter_registry.register('cross-account')

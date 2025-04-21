@@ -162,7 +162,8 @@ class ComprehendFlywheelTests(BaseTest):
                 "key": "DataSecurityConfig.VpcConfig",
                 "value": "present"
             }
-        ], },
+        ],
+        },
             session_factory=session_factory,
         )
         resources = p.run()
