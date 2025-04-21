@@ -63,9 +63,6 @@ class ComprehendEntityRecognizerTests(BaseTest):
         )
         resources = p.run()
 
-        if not resources:
-            self.skipTest("No entity recognizers found with tag ASV=PolicyTestASV")
-
         self.assertEqual(len(resources), 1, "Should find one resource with the tag")
 
         p = self.load_policy(
