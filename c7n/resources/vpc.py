@@ -3409,12 +3409,6 @@ class ResolverQueryLoggingFilter(Filter):
                     state: true
                     bucket: my-logging-bucket
 
-              - name: vpc-resolver-logs-to-specific-bucket
-                resource: vpc
-                filters:
-                  - type: resolver-query-logging
-                    state: true
-                    bucket: my-security-logs-bucket
     """
     schema = type_schema(
         'resolver-query-logging',
