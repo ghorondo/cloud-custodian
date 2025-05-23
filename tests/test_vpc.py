@@ -511,6 +511,68 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue("vpce-011d813b183878b82" in resources[0]["VpcEndpointId"])
 
+    @terraform('vpc_resolver_query_logging')
+    def test_vpc_resolver_query_logging(self):
+        factory = self.replay_flight_data("test_vpc_resolver_query_logging")
+
+        vpc_with_logging_id = "vpc-0503a8b9ddbb3a5c5"  # VPC with resolver logging
+        vpc_without_logging_id = "vpc-029d7b65096a4717d"  # VPC without resolver logging
+
+        # Checking VPCs without resolver query logging
+        p = self.load_policy(
+            {
+                "name": "vpc-without-resolver-query-logging",
+                "resource": "vpc",
+                "filters": [
+                    {"VpcId": vpc_without_logging_id},
+                    {"type": "resolver-query-logging", "state": False}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcId"], vpc_without_logging_id)
+        self.assertEqual(resources[0]["c7n:resolver-logging"]["enabled"], False)
+
+        # Checking VPCs with resolver query logging
+        p = self.load_policy(
+            {
+                "name": "vpc-with-resolver-query-logging",
+                "resource": "vpc",
+                "filters": [
+                    {"VpcId": vpc_with_logging_id},
+                    {"type": "resolver-query-logging", "state": True}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcId"], vpc_with_logging_id)
+        self.assertEqual(resources[0]["c7n:resolver-logging"]["enabled"], True)
+
+        # Checking VPCs with resolver query logging to any S3 bucket
+        p = self.load_policy(
+            {
+                "name": "vpc-with-resolver-query-logging-s3",
+                "resource": "vpc",
+                "filters": [
+                    {"VpcId": vpc_with_logging_id},
+                    {
+                        "type": "resolver-query-logging",
+                        "state": True,
+                        "s3-destination": True
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["VpcId"], vpc_with_logging_id)
+        self.assertTrue(resources[0]["c7n:resolver-logging"]["destination_arn"])
+
 
 class NetworkLocationTest(BaseTest):
 
