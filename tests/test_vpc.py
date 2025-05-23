@@ -4360,6 +4360,71 @@ def test_eip_shield_sync_deleted(test, eip_shield_sync):
     test.assertEqual(len(protections["Protections"]), 1)
 
 
+@terraform('vpc_resolver_query_logging')
+def test_vpc_resolver_query_logging(test):
+    """Test filtering VPCs based on Route 53 Resolver query logging configuration."""
+
+    factory = test.replay_flight_data("test_vpc_resolver_query_logging")
+
+    vpc_with_logging_id = "vpc-0503a8b9ddbb3a5c5"  # VPC with resolver logging
+    vpc_without_logging_id = "vpc-029d7b65096a4717d"  # VPC without resolver logging
+
+    # Test finding VPCs without resolver query logging
+    p = test.load_policy(
+        {
+            "name": "vpc-without-resolver-query-logging",
+            "resource": "vpc",
+            "filters": [
+                {"VpcId": vpc_without_logging_id},
+                {"type": "resolver-query-logging", "state": False}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]["VpcId"], vpc_without_logging_id)
+    test.assertEqual(resources[0]["c7n:resolver-logging"]["enabled"], False)
+
+    # Test finding VPCs with resolver query logging
+    p = test.load_policy(
+        {
+            "name": "vpc-with-resolver-query-logging",
+            "resource": "vpc",
+            "filters": [
+                {"VpcId": vpc_with_logging_id},
+                {"type": "resolver-query-logging", "state": True}
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]["VpcId"], vpc_with_logging_id)
+    test.assertEqual(resources[0]["c7n:resolver-logging"]["enabled"], True)
+
+    # Test finding VPCs with resolver query logging to any S3 bucket
+    p = test.load_policy(
+        {
+            "name": "vpc-with-resolver-query-logging-s3",
+            "resource": "vpc",
+            "filters": [
+                {"VpcId": vpc_with_logging_id},
+                {
+                    "type": "resolver-query-logging",
+                    "state": True,
+                    "s3-destination": True
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    test.assertEqual(resources[0]["VpcId"], vpc_with_logging_id)
+    test.assertTrue(resources[0]["c7n:resolver-logging"]["destination_arn"])
+
+
 class TestVPCEndpointServiceConfiguration(BaseTest):
     def test_query(self):
         session_factory = self.replay_flight_data("test_vpc_endpoint_service_configuration_query")
