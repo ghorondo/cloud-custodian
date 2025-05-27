@@ -3451,7 +3451,7 @@ class ResolverQueryLoggingFilter(Filter):
         except (client.exceptions.ClientError, client.exceptions.NoCredentialsError):
             raise
         except Exception as e:
-            self.log.warning(f"Unexpected error fetching resolver query log configurations: {e}")
+            self.log.warning("Unexpected error fetching resolver query log configurations: %s", e)
             return resources
 
         results = []
@@ -3480,7 +3480,7 @@ class ResolverQueryLoggingFilter(Filter):
                             bucket_name = bucket_name.split('/')[0]
                         vpc[self.annotation_key]['bucket_name'] = bucket_name
                 except Exception:
-                    pass
+                    self.log.debug("Failed to parse ARN for bucket extraction: %s", destination_arn)
 
             if has_logging != target_state:
                 continue
@@ -3493,7 +3493,7 @@ class ResolverQueryLoggingFilter(Filter):
                         parsed_arn = Arn.parse(destination_arn)
                         is_s3 = parsed_arn.service == 's3'
                     except Exception:
-                        pass
+                        self.log.debug("Failed to parse ARN for S3 validation: %s", destination_arn)
 
                 if not is_s3:
                     continue
