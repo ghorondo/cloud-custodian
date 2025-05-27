@@ -564,6 +564,88 @@ class VpcTest(BaseTest):
         self.assertEqual(resources[0]["c7n:resolver-logging"]["bucket_name"],
                         "resolver-query-logs-20250513181124788700000003")
 
+        p = self.load_policy({
+            "name": "multiple-vpcs",
+            "resource": "vpc",
+            "filters": [{"type": "resolver-query-logging", "state": False}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertTrue(any(r["VpcId"] == vpc_without_logging_id for r in resources))
+
+    def test_vpc_resolver_query_logging_arn_exceptions(self):
+        """Test ARN parsing exceptions in resolver query logging filter"""
+        factory = self.replay_flight_data("test_vpc_resolver_query_logging")
+
+        with patch('c7n.resources.vpc.Arn.parse', side_effect=Exception("Invalid ARN")):
+            p = self.load_policy({
+                "name": "test-arn-exception",
+                "resource": "vpc",
+                "filters": [{"type": "resolver-query-logging", "state": True}]
+            }, session_factory=factory)
+
+            filter_instance = p.resource_manager.filters[0]
+
+            mock_client = MagicMock()
+            mock_paginator = MagicMock()
+            mock_paginator.paginate.return_value = [
+                {'ResolverQueryLogConfigAssociations': [{
+                    'Status': 'ACTIVE',
+                    'ResourceId': 'vpc-test',
+                    'ResolverQueryLogConfigId': 'cfg-1'
+                }]},
+                {'ResolverQueryLogConfigs': [{
+                    'Id': 'cfg-1',
+                    'Status': 'ACTIVE',
+                    'Name': 'test-config',
+                    'DestinationArn': 'arn:aws:s3:::bucket/prefix'
+                }]}
+            ]
+            mock_client.get_paginator.return_value = mock_paginator
+
+            with patch('c7n.resources.vpc.local_session') as mock_session:
+                mock_session.return_value.client.return_value = mock_client
+
+                resources = filter_instance.process([{'VpcId': 'vpc-test'}])
+
+                self.assertEqual(len(resources), 1)
+                self.assertEqual(resources[0]['c7n:resolver-logging']['bucket_name'], '')
+
+        with patch('c7n.resources.vpc.Arn') as mock_arn:
+            mock_parsed = MagicMock(service='s3', resource='bucket')
+            mock_arn.parse.side_effect = [mock_parsed, Exception("Invalid ARN")]
+
+            p = self.load_policy({
+                "name": "test-s3-validation-exception",
+                "resource": "vpc",
+            "filters": [{"type": "resolver-query-logging", "state": True, "s3-destination": True}]
+            }, session_factory=factory)
+
+            filter_instance = p.resource_manager.filters[0]
+
+            mock_client = MagicMock()
+            mock_paginator = MagicMock()
+            mock_paginator.paginate.return_value = [
+                {'ResolverQueryLogConfigAssociations': [{
+                    'Status': 'ACTIVE',
+                    'ResourceId': 'vpc-test2',
+                    'ResolverQueryLogConfigId': 'cfg-2'
+                }]},
+                {'ResolverQueryLogConfigs': [{
+                    'Id': 'cfg-2',
+                    'Status': 'ACTIVE',
+                    'Name': 'test-config2',
+                    'DestinationArn': 'arn:aws:s3:::bucket2'
+                }]}
+            ]
+            mock_client.get_paginator.return_value = mock_paginator
+
+            with patch('c7n.resources.vpc.local_session') as mock_session:
+                mock_session.return_value.client.return_value = mock_client
+
+                resources = filter_instance.process([{'VpcId': 'vpc-test2'}])
+
+                self.assertEqual(len(resources), 0)
+
 
 class NetworkLocationTest(BaseTest):
 
