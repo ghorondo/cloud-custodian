@@ -13,6 +13,7 @@ from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
 from c7n.filters.revisions import Diff
 from c7n import query, resolver
 from c7n.manager import resources
+from c7n.resources.aws import Arn
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
     chunks,
@@ -3391,7 +3392,7 @@ class ResolverQueryLoggingFilter(Filter):
     This filter checks if VPCs have Route 53 Resolver query logging enabled
     and optionally verifies if logs are being sent to a specific S3 destination.
 
-    :Example:
+    :example:
 
     .. code-block:: yaml
 
@@ -3436,8 +3437,7 @@ class ResolverQueryLoggingFilter(Filter):
             paginator = client.get_paginator('list_resolver_query_log_config_associations')
             for page in paginator.paginate():
                 for assoc in page.get('ResolverQueryLogConfigAssociations', []):
-                    if (assoc['ResourceId'].startswith('vpc-') and
-                        assoc['Status'] in ['ACTIVE', 'CREATING']):
+                    if assoc['Status'] in ['ACTIVE', 'CREATING']:
                         vpc_to_config[assoc['ResourceId']] = assoc['ResolverQueryLogConfigId']
 
             log_configs = {}
@@ -3448,16 +3448,18 @@ class ResolverQueryLoggingFilter(Filter):
                         if config['Status'] in ['COMPLETE', 'CREATING', 'ACTIVE', 'CREATED']:
                             log_configs[config['Id']] = config
 
+        except (client.exceptions.ClientError, client.exceptions.NoCredentialsError):
+            raise
         except Exception as e:
-            self.log.warning(f"Error fetching resolver query log configurations: {e}")
+            self.log.warning(f"Unexpected error fetching resolver query log configurations: {e}")
             return resources
 
         results = []
         for vpc in resources:
             vpc_id = vpc['VpcId']
             has_logging = vpc_id in vpc_to_config
-            config_id = vpc_to_config.get(vpc_id)
-            config = log_configs.get(config_id, {}) if config_id else {}
+            config_id = vpc_to_config.get(vpc_id, "")
+            config = log_configs.get(config_id, {})
 
             vpc[self.annotation_key] = {
                 'enabled': has_logging,
@@ -3469,21 +3471,33 @@ class ResolverQueryLoggingFilter(Filter):
             }
 
             destination_arn = config.get('DestinationArn', '')
-            if destination_arn.startswith('arn:aws:s3:::'):
-                bucket_name = destination_arn[13:]
-                if '/' in bucket_name:
-                    bucket_name = bucket_name.split('/')[0]
-                vpc[self.annotation_key]['bucket_name'] = bucket_name
+            if destination_arn and Arn:
+                try:
+                    parsed_arn = Arn.parse(destination_arn)
+                    if parsed_arn.service == 's3':
+                        bucket_name = parsed_arn.resource
+                        if '/' in bucket_name:
+                            bucket_name = bucket_name.split('/')[0]
+                        vpc[self.annotation_key]['bucket_name'] = bucket_name
+                except Exception:
+                    pass
 
             if has_logging != target_state:
                 continue
 
             if (check_bucket or check_s3_destination) and has_logging:
                 destination_arn = config.get('DestinationArn', '')
-                if not destination_arn.startswith('arn:aws:s3:::'):
+                is_s3 = False
+                if destination_arn and Arn:
+                    try:
+                        parsed_arn = Arn.parse(destination_arn)
+                        is_s3 = parsed_arn.service == 's3'
+                    except Exception:
+                        pass
+
+                if not is_s3:
                     continue
 
-                # Only check specific bucket if specified
                 if check_bucket:
                     current_bucket = vpc[self.annotation_key]['bucket_name']
                     if current_bucket != check_bucket:
