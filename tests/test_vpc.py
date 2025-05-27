@@ -3,7 +3,7 @@
 import logging
 import time
 from .common import BaseTest, functional, event_data, load_data
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
@@ -518,7 +518,6 @@ class VpcTest(BaseTest):
         vpc_with_logging_id = "vpc-0503a8b9ddbb3a5c5"
         vpc_without_logging_id = "vpc-029d7b65096a4717d"
 
-        # Helper function
         def run_policy(name, vpc_id, filter_config, expected_count=1):
             p = self.load_policy({
                 "name": name,
@@ -529,26 +528,31 @@ class VpcTest(BaseTest):
             self.assertEqual(len(resources), expected_count)
             return resources
 
+        # Test VPC without logging
         resources = run_policy("vpc-without-logging", vpc_without_logging_id,
                             {"type": "resolver-query-logging", "state": False})
         self.assertEqual(resources[0]["VpcId"], vpc_without_logging_id)
         self.assertEqual(resources[0]["c7n:resolver-logging"]["enabled"], False)
 
+        # Test VPC with logging
         resources = run_policy("vpc-with-logging", vpc_with_logging_id,
                             {"type": "resolver-query-logging", "state": True})
         self.assertEqual(resources[0]["VpcId"], vpc_with_logging_id)
         self.assertEqual(resources[0]["c7n:resolver-logging"]["enabled"], True)
 
+        # Test S3 destination filter
         resources = run_policy("vpc-with-s3", vpc_with_logging_id,
                         {"type": "resolver-query-logging", "state": True, "s3-destination": True})
         self.assertEqual(resources[0]["VpcId"], vpc_with_logging_id)
         self.assertTrue(resources[0]["c7n:resolver-logging"]["destination_arn"])
 
+        # Test inverse state filters
         run_policy("vpc-with-logging-want-false", vpc_with_logging_id,
                 {"type": "resolver-query-logging", "state": False}, expected_count=0)
         run_policy("vpc-without-logging-want-true", vpc_without_logging_id,
                 {"type": "resolver-query-logging", "state": True}, expected_count=0)
 
+        # Test bucket filters
         run_policy("vpc-wrong-bucket", vpc_with_logging_id,
                 {"type": "resolver-query-logging", "state": True, "bucket": "wrong-bucket"},
                 expected_count=0)
