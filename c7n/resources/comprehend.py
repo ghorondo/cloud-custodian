@@ -42,7 +42,11 @@ class ComprehendDocumentClassifier(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_document_classifiers', 'DocumentClassifierPropertiesList', None)
+        enum_spec = (
+            'list_document_classifiers',
+            'DocumentClassifierPropertiesList',
+            None,
+        )
         arn = id = 'DocumentClassifierArn'
         name = 'DocumentClassifierArn'
         date = 'SubmitTime'
@@ -58,7 +62,12 @@ class ComprehendFlywheel(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'comprehend'
         enum_spec = ('list_flywheels', 'FlywheelSummaryList', None)
-        detail_spec = ('describe_flywheel', 'FlywheelArn', 'FlywheelArn', 'FlywheelProperties')
+        detail_spec = (
+            'describe_flywheel',
+            'FlywheelArn',
+            'FlywheelArn',
+            'FlywheelProperties',
+        )
         arn = id = 'FlywheelArn'
         name = 'FlywheelArn'
         date = 'LastModifiedTime'
@@ -73,15 +82,27 @@ class ComprehendEntitiesDetectionJob(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_entities_detection_jobs', 'EntitiesDetectionJobPropertiesList', None)
-        detail_spec = ('describe_entities_detection_job', 'JobId', 'JobId', 'EntitiesDetectionJobProperties')
+        enum_spec = (
+            'list_entities_detection_jobs',
+            'EntitiesDetectionJobPropertiesList',
+            None,
+        )
+        detail_spec = (
+            'describe_entities_detection_job',
+            'JobId',
+            'JobId',
+            'EntitiesDetectionJobProperties',
+        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
         date = 'SubmitTime'
         universal_taggable = object()
 
-    permissions = ('comprehend:ListEntitiesDetectionJobs', 'comprehend:DescribeEntitiesDetectionJob')
+    permissions = (
+        'comprehend:ListEntitiesDetectionJobs',
+        'comprehend:DescribeEntitiesDetectionJob',
+    )
     source_mapping = {'describe': DescribeWithResourceTags}
 
 
@@ -90,15 +111,27 @@ class ComprehendSentimentDetectionJob(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_sentiment_detection_jobs', 'SentimentDetectionJobPropertiesList', None)
-        detail_spec = ('describe_sentiment_detection_job', 'JobId', 'JobId', 'SentimentDetectionJobProperties')
+        enum_spec = (
+            'list_sentiment_detection_jobs',
+            'SentimentDetectionJobPropertiesList',
+            None,
+        )
+        detail_spec = (
+            'describe_sentiment_detection_job',
+            'JobId',
+            'JobId',
+            'SentimentDetectionJobProperties',
+        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
         date = 'SubmitTime'
         universal_taggable = object()
 
-    permissions = ('comprehend:ListSentimentDetectionJobs', 'comprehend:DescribeSentimentDetectionJob')
+    permissions = (
+        'comprehend:ListSentimentDetectionJobs',
+        'comprehend:DescribeSentimentDetectionJob',
+    )
     source_mapping = {'describe': DescribeWithResourceTags}
 
 
@@ -107,15 +140,27 @@ class ComprehendDocumentClassificationJob(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_document_classification_jobs', 'DocumentClassificationJobPropertiesList', None)
-        detail_spec = ('describe_document_classification_job', 'JobId', 'JobId', 'DocumentClassificationJobProperties')
+        enum_spec = (
+            'list_document_classification_jobs',
+            'DocumentClassificationJobPropertiesList',
+            None,
+        )
+        detail_spec = (
+            'describe_document_classification_job',
+            'JobId',
+            'JobId',
+            'DocumentClassificationJobProperties',
+        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
         date = 'SubmitTime'
         universal_taggable = object()
 
-    permissions = ('comprehend:ListDocumentClassificationJobs', 'comprehend:DescribeDocumentClassificationJob')
+    permissions = (
+        'comprehend:ListDocumentClassificationJobs',
+        'comprehend:DescribeDocumentClassificationJob',
+    )
     source_mapping = {'describe': DescribeWithResourceTags}
 
 
@@ -124,15 +169,27 @@ class ComprehendTopicsDetectionJob(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_topics_detection_jobs', 'TopicsDetectionJobPropertiesList', None)
-        detail_spec = ('describe_topics_detection_job', 'JobId', 'JobId', 'TopicsDetectionJobProperties')
+        enum_spec = (
+            'list_topics_detection_jobs',
+            'TopicsDetectionJobPropertiesList',
+            None,
+        )
+        detail_spec = (
+            'describe_topics_detection_job',
+            'JobId',
+            'JobId',
+            'TopicsDetectionJobProperties',
+        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
         date = 'SubmitTime'
         universal_taggable = object()
 
-    permissions = ('comprehend:ListTopicsDetectionJobs', 'comprehend:DescribeTopicsDetectionJob')
+    permissions = (
+        'comprehend:ListTopicsDetectionJobs',
+        'comprehend:DescribeTopicsDetectionJob',
+    )
     source_mapping = {'describe': DescribeWithResourceTags}
 
 
@@ -141,15 +198,27 @@ class ComprehendDominantLanguageDetectionJob(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_dominant_language_detection_jobs', 'DominantLanguageDetectionJobPropertiesList', None)
-        detail_spec = ('describe_dominant_language_detection_job', 'JobId', 'JobId', 'DominantLanguageDetectionJobProperties')
+        enum_spec = (
+            'list_dominant_language_detection_jobs',
+            'DominantLanguageDetectionJobPropertiesList',
+            None,
+        )
+        detail_spec = (
+            'describe_dominant_language_detection_job',
+            'JobId',
+            'JobId',
+            'DominantLanguageDetectionJobProperties',
+        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
         date = 'SubmitTime'
         universal_taggable = object()
 
-    permissions = ('comprehend:ListDominantLanguageDetectionJobs', 'comprehend:DescribeDominantLanguageDetectionJob')
+    permissions = (
+        'comprehend:ListDominantLanguageDetectionJobs',
+        'comprehend:DescribeDominantLanguageDetectionJob',
+    )
     source_mapping = {'describe': DescribeWithResourceTags}
 
 
@@ -158,15 +227,27 @@ class ComprehendKeyPhrasesDetectionJob(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_key_phrases_detection_jobs', 'KeyPhrasesDetectionJobPropertiesList', None)
-        detail_spec = ('describe_key_phrases_detection_job', 'JobId', 'JobId', 'KeyPhrasesDetectionJobProperties')
+        enum_spec = (
+            'list_key_phrases_detection_jobs',
+            'KeyPhrasesDetectionJobPropertiesList',
+            None,
+        )
+        detail_spec = (
+            'describe_key_phrases_detection_job',
+            'JobId',
+            'JobId',
+            'KeyPhrasesDetectionJobProperties',
+        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
         date = 'SubmitTime'
         universal_taggable = object()
 
-    permissions = ('comprehend:ListKeyPhrasesDetectionJobs', 'comprehend:DescribeKeyPhrasesDetectionJob')
+    permissions = (
+        'comprehend:ListKeyPhrasesDetectionJobs',
+        'comprehend:DescribeKeyPhrasesDetectionJob',
+    )
     source_mapping = {'describe': DescribeWithResourceTags}
 
 
@@ -175,15 +256,27 @@ class ComprehendPiiEntitiesDetectionJob(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_pii_entities_detection_jobs', 'PiiEntitiesDetectionJobPropertiesList', None)
-        detail_spec = ('describe_pii_entities_detection_job', 'JobId', 'JobId', 'PiiEntitiesDetectionJobProperties')
+        enum_spec = (
+            'list_pii_entities_detection_jobs',
+            'PiiEntitiesDetectionJobPropertiesList',
+            None,
+        )
+        detail_spec = (
+            'describe_pii_entities_detection_job',
+            'JobId',
+            'JobId',
+            'PiiEntitiesDetectionJobProperties',
+        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
         date = 'SubmitTime'
         universal_taggable = object()
 
-    permissions = ('comprehend:ListPiiEntitiesDetectionJobs', 'comprehend:DescribePiiEntitiesDetectionJob')
+    permissions = (
+        'comprehend:ListPiiEntitiesDetectionJobs',
+        'comprehend:DescribePiiEntitiesDetectionJob',
+    )
     source_mapping = {'describe': DescribeWithResourceTags}
 
 
@@ -192,15 +285,27 @@ class ComprehendEventsDetectionJob(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_events_detection_jobs', 'EventsDetectionJobPropertiesList', None)
-        detail_spec = ('describe_events_detection_job', 'JobId', 'JobId', 'EventsDetectionJobProperties')
+        enum_spec = (
+            'list_events_detection_jobs',
+            'EventsDetectionJobPropertiesList',
+            None,
+        )
+        detail_spec = (
+            'describe_events_detection_job',
+            'JobId',
+            'JobId',
+            'EventsDetectionJobProperties',
+        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
         date = 'SubmitTime'
         universal_taggable = object()
 
-    permissions = ('comprehend:ListEventsDetectionJobs', 'comprehend:DescribeEventsDetectionJob')
+    permissions = (
+        'comprehend:ListEventsDetectionJobs',
+        'comprehend:DescribeEventsDetectionJob',
+    )
     source_mapping = {'describe': DescribeWithResourceTags}
 
 
@@ -209,15 +314,27 @@ class ComprehendTargetedSentimentDetectionJob(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'comprehend'
-        enum_spec = ('list_targeted_sentiment_detection_jobs', 'TargetedSentimentDetectionJobPropertiesList', None)
-        detail_spec = ('describe_targeted_sentiment_detection_job', 'JobId', 'JobId', 'TargetedSentimentDetectionJobProperties')
+        enum_spec = (
+            'list_targeted_sentiment_detection_jobs',
+            'TargetedSentimentDetectionJobPropertiesList',
+            None,
+        )
+        detail_spec = (
+            'describe_targeted_sentiment_detection_job',
+            'JobId',
+            'JobId',
+            'TargetedSentimentDetectionJobProperties',
+        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
         date = 'SubmitTime'
         universal_taggable = object()
 
-    permissions = ('comprehend:ListTargetedSentimentDetectionJobs', 'comprehend:DescribeTargetedSentimentDetectionJob')
+    permissions = (
+        'comprehend:ListTargetedSentimentDetectionJobs',
+        'comprehend:DescribeTargetedSentimentDetectionJob',
+    )
     source_mapping = {'describe': DescribeWithResourceTags}
 
 
@@ -225,6 +342,7 @@ class ComprehendTargetedSentimentDetectionJob(QueryResourceManager):
 @ComprehendDocumentClassifier.filter_registry.register('cross-account')
 class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
     """Checks for cross-account access in Comprehend model resource policies."""
+
     permissions = ('comprehend:DescribeResourcePolicy',)
     policy_annotation = "c7n:AccessPolicy"
 
@@ -238,7 +356,11 @@ class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
         result = self.manager.retry(
             client.describe_resource_policy,
             ResourceArn=arn,
-            ignore_err_codes=('ResourceNotFoundException', 'PolicyNotFoundException'))
+            ignore_err_codes=(
+                'ResourceNotFoundException',
+                'PolicyNotFoundException',
+            ),
+        )
 
         if result is not None:
             r[self.policy_annotation] = result['ResourcePolicy']
@@ -251,6 +373,7 @@ class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
 @ComprehendDocumentClassifier.filter_registry.register('kms-key')
 class ComprehendModelKmsFilter(KmsRelatedFilter):
     """Filter Comprehend models/recognizers by their KMS key."""
+
     RelatedIdsExpression = 'VolumeKmsKeyId'
 
 
@@ -265,4 +388,5 @@ class ComprehendModelKmsFilter(KmsRelatedFilter):
 @ComprehendTargetedSentimentDetectionJob.filter_registry.register('kms-key')
 class ComprehendJobKmsFilter(KmsRelatedFilter):
     """Filter Comprehend analysis jobs by their KMS key."""
+
     RelatedIdsExpression = 'OutputDataConfig.KmsKeyId'

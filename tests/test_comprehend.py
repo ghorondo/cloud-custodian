@@ -2,10 +2,8 @@ from .common import BaseTest
 
 
 class ComprehendEndpointTests(BaseTest):
-
     def test_comprehend_endpoint_tag_untag(self):
         session_factory = self.replay_flight_data("test_comprehend_endpoint_tag_untag")
-
         p = self.load_policy(
             {
                 "name": "comprehend-endpoint-tags-find",
@@ -19,7 +17,6 @@ class ComprehendEndpointTests(BaseTest):
 
         client = session_factory().client("comprehend")
         arn = resources[0]["EndpointArn"]
-
         client.untag_resource(ResourceArn=arn, TagKeys=["ASV"])
 
         p_after = self.load_policy(
@@ -47,22 +44,22 @@ class ComprehendEntityRecognizerTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('EntityRecognizerArn' in resources[0])
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("EntityRecognizerArn" in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_entity_recognizer_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_entity_recognizer_tag_untag")
-
+        session_factory = self.replay_flight_data(
+            "test_comprehend_entity_recognizer_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "find-tagged-entity-recognizer",
                 "resource": "comprehend-entity-recognizer",
-                "filters": [{"tag:ASV": "PolicyTestASV"}]
+                "filters": [{"tag:ASV": "PolicyTestASV"}],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-
         self.assertEqual(len(resources), 1, "Should find one resource with the tag")
 
         p = self.load_policy(
@@ -70,7 +67,7 @@ class ComprehendEntityRecognizerTests(BaseTest):
                 "name": "untag-entity-recognizer",
                 "resource": "comprehend-entity-recognizer",
                 "filters": [{"tag:ASV": "PolicyTestASV"}],
-                "actions": [{"type": "remove-tag", "tags": ["ASV"]}]
+                "actions": [{"type": "remove-tag", "tags": ["ASV"]}],
             },
             session_factory=session_factory,
         )
@@ -80,8 +77,8 @@ class ComprehendEntityRecognizerTests(BaseTest):
         arn = resources[0]["EntityRecognizerArn"]
         tags = client.list_tags_for_resource(ResourceArn=arn)
         self.assertFalse(
-            any(t.get('Key') == 'ASV' for t in tags.get("Tags", [])),
-            "Tag should be removed"
+            any(t.get("Key") == "ASV" for t in tags.get("Tags", [])),
+            "Tag should be removed",
         )
 
     def test_comprehend_entity_recognizer_cross_account(self):
@@ -98,7 +95,9 @@ class ComprehendEntityRecognizerTests(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_comprehend_entity_recognizer_kms_key(self):
-        session_factory = self.replay_flight_data("test_comprehend_entity_recognizer_kms_key")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_entity_recognizer_kms_key"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-entity-recognizer-kms",
@@ -109,11 +108,10 @@ class ComprehendEntityRecognizerTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['VolumeKmsKeyId'])
+        self.assertTrue(resources[0]["VolumeKmsKeyId"])
 
 
 class ComprehendDocumentClassifierTests(BaseTest):
-
     def test_comprehend_document_classifier_vpc(self):
         session_factory = self.replay_flight_data("test_comprehend_document_classifier_vpc")
         p = self.load_policy(
@@ -126,10 +124,12 @@ class ComprehendDocumentClassifierTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_document_classifier_cross_account(self):
-        factory = self.replay_flight_data("test_comprehend_document_classifier_cross_account")
+        factory = self.replay_flight_data(
+            "test_comprehend_document_classifier_cross_account"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-document-classifier-cross-account",
@@ -142,7 +142,9 @@ class ComprehendDocumentClassifierTests(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_comprehend_document_classifier_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_document_classifier_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_document_classifier_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-document-classifier-tags",
@@ -160,7 +162,9 @@ class ComprehendDocumentClassifierTests(BaseTest):
         self.assertEqual(len(tags.get("Tags", [])), 0)
 
     def test_comprehend_document_classifier_kms_key(self):
-        session_factory = self.replay_flight_data("test_comprehend_document_classifier_kms_key")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_document_classifier_kms_key"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-document-classifier-kms",
@@ -171,7 +175,7 @@ class ComprehendDocumentClassifierTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['VolumeKmsKeyId'])
+        self.assertTrue(resources[0]["VolumeKmsKeyId"])
 
 
 class ComprehendFlywheelTests(BaseTest):
@@ -179,23 +183,23 @@ class ComprehendFlywheelTests(BaseTest):
         session_factory = self.replay_flight_data("test_comprehend_flywheel_vpc")
         p = self.load_policy(
             {
-            "name": "list-comprehend-flywheels",
-            "resource": "comprehend-flywheel",
-            "filters": [
-            {
-                "type": "value",
-                "key": "DataSecurityConfig.VpcConfig",
-                "value": "present"
-            }
-        ],
-        },
+                "name": "list-comprehend-flywheels",
+                "resource": "comprehend-flywheel",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "DataSecurityConfig.VpcConfig",
+                        "value": "present",
+                    }
+                ],
+            },
             session_factory=session_factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('FlywheelArn' in resources[0])
-        self.assertTrue('DataSecurityConfig' in resources[0])
-        self.assertTrue('VpcConfig' in resources[0]['DataSecurityConfig'])
+        self.assertTrue("FlywheelArn" in resources[0])
+        self.assertTrue("DataSecurityConfig" in resources[0])
+        self.assertTrue("VpcConfig" in resources[0]["DataSecurityConfig"])
 
     def test_comprehend_flywheel_tag_untag(self):
         session_factory = self.replay_flight_data("test_comprehend_flywheel_tag_untag")
@@ -218,9 +222,12 @@ class ComprehendFlywheelTests(BaseTest):
 
 # Job Tests
 
+
 class ComprehendEntitiesDetectionJobTests(BaseTest):
     def test_comprehend_entities_detection_job_vpc(self):
-        session_factory = self.replay_flight_data("test_comprehend_entities_detection_job_vpc")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_entities_detection_job_vpc"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-entities-detection-job-vpc",
@@ -231,10 +238,12 @@ class ComprehendEntitiesDetectionJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_entities_detection_job_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_entities_detection_job_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_entities_detection_job_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-entities-detection-job-tags",
@@ -254,7 +263,9 @@ class ComprehendEntitiesDetectionJobTests(BaseTest):
 
 class ComprehendSentimentDetectionJobTests(BaseTest):
     def test_comprehend_sentiment_detection_job_vpc(self):
-        session_factory = self.replay_flight_data("test_comprehend_sentiment_detection_job_vpc")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_sentiment_detection_job_vpc"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-sentiment-detection-job-vpc",
@@ -265,10 +276,12 @@ class ComprehendSentimentDetectionJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_sentiment_detection_job_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_sentiment_detection_job_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_sentiment_detection_job_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-sentiment-detection-job-tags",
@@ -288,7 +301,9 @@ class ComprehendSentimentDetectionJobTests(BaseTest):
 
 class ComprehendDocumentClassificationJobTests(BaseTest):
     def test_comprehend_document_classification_job_vpc(self):
-        session_factory = self.replay_flight_data("test_comprehend_document_classification_job_vpc")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_document_classification_job_vpc"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-document-classification-job-vpc",
@@ -299,10 +314,12 @@ class ComprehendDocumentClassificationJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_document_classification_job_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_document_classification_job_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_document_classification_job_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-document-classification-job-tags",
@@ -322,7 +339,9 @@ class ComprehendDocumentClassificationJobTests(BaseTest):
 
 class ComprehendTopicsDetectionJobTests(BaseTest):
     def test_comprehend_topics_detection_job_vpc(self):
-        session_factory = self.replay_flight_data("test_comprehend_topics_detection_job_vpc")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_topics_detection_job_vpc"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-topics-detection-job-vpc",
@@ -333,10 +352,12 @@ class ComprehendTopicsDetectionJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_topics_detection_job_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_topics_detection_job_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_topics_detection_job_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-topics-detection-job-tags",
@@ -356,7 +377,9 @@ class ComprehendTopicsDetectionJobTests(BaseTest):
 
 class ComprehendDominantLanguageDetectionJobTests(BaseTest):
     def test_comprehend_dominant_language_detection_job_vpc(self):
-        session_factory = self.replay_flight_data("test_comprehend_dominant_language_detection_job_vpc")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_dominant_language_detection_job_vpc"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-dominant-language-detection-job-vpc",
@@ -367,10 +390,12 @@ class ComprehendDominantLanguageDetectionJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_dominant_language_detection_job_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_dominant_language_detection_job_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_dominant_language_detection_job_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-dominant-language-detection-job-tags",
@@ -390,7 +415,9 @@ class ComprehendDominantLanguageDetectionJobTests(BaseTest):
 
 class ComprehendKeyPhrasesDetectionJobTests(BaseTest):
     def test_comprehend_key_phrases_detection_job_vpc(self):
-        session_factory = self.replay_flight_data("test_comprehend_key_phrases_detection_job_vpc")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_key_phrases_detection_job_vpc"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-key-phrases-detection-job-vpc",
@@ -401,10 +428,12 @@ class ComprehendKeyPhrasesDetectionJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_key_phrases_detection_job_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_key_phrases_detection_job_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_key_phrases_detection_job_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-key-phrases-detection-job-tags",
@@ -424,7 +453,9 @@ class ComprehendKeyPhrasesDetectionJobTests(BaseTest):
 
 class ComprehendPiiEntitiesDetectionJobTests(BaseTest):
     def test_comprehend_pii_entities_detection_job_vpc(self):
-        session_factory = self.replay_flight_data("test_comprehend_pii_entities_detection_job_vpc")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_pii_entities_detection_job_vpc"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-pii-entities-detection-job-vpc",
@@ -435,10 +466,12 @@ class ComprehendPiiEntitiesDetectionJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_pii_entities_detection_job_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_pii_entities_detection_job_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_pii_entities_detection_job_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-pii-entities-detection-job-tags",
@@ -456,7 +489,9 @@ class ComprehendPiiEntitiesDetectionJobTests(BaseTest):
         self.assertEqual(len(tags.get("Tags", [])), 0)
 
     def test_comprehend_pii_entities_detection_job_kms_key(self):
-        session_factory = self.replay_flight_data("test_comprehend_pii_entities_detection_job_kms_key")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_pii_entities_detection_job_kms_key"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-pii-job-kms",
@@ -467,12 +502,14 @@ class ComprehendPiiEntitiesDetectionJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]['OutputDataConfig']['KmsKeyId'])
+        self.assertTrue(resources[0]["OutputDataConfig"]["KmsKeyId"])
 
 
 class ComprehendEventsDetectionJobTests(BaseTest):
     def test_comprehend_events_detection_job_vpc(self):
-        session_factory = self.replay_flight_data("test_comprehend_events_detection_job_vpc")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_events_detection_job_vpc"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-events-detection-job-vpc",
@@ -483,10 +520,12 @@ class ComprehendEventsDetectionJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_events_detection_job_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_events_detection_job_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_events_detection_job_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-events-detection-job-tags",
@@ -506,7 +545,9 @@ class ComprehendEventsDetectionJobTests(BaseTest):
 
 class ComprehendTargetedSentimentDetectionJobTests(BaseTest):
     def test_comprehend_targeted_sentiment_detection_job_vpc(self):
-        session_factory = self.replay_flight_data("test_comprehend_targeted_sentiment_detection_job_vpc")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_targeted_sentiment_detection_job_vpc"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-targeted-sentiment-detection-job-vpc",
@@ -517,10 +558,12 @@ class ComprehendTargetedSentimentDetectionJobTests(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertTrue('VpcConfig' in resources[0])
+        self.assertTrue("VpcConfig" in resources[0])
 
     def test_comprehend_targeted_sentiment_detection_job_tag_untag(self):
-        session_factory = self.replay_flight_data("test_comprehend_targeted_sentiment_detection_job_tag_untag")
+        session_factory = self.replay_flight_data(
+            "test_comprehend_targeted_sentiment_detection_job_tag_untag"
+        )
         p = self.load_policy(
             {
                 "name": "comprehend-targeted-sentiment-detection-job-tags",
