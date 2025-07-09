@@ -328,11 +328,13 @@ class ComprehendModelKmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = 'VolumeKmsKeyId'
 
+
 @ComprehendFlywheel.filter_registry.register('kms-key')
 class ComprehendFlywheelKmsFilter(KmsRelatedFilter):
     """Filter Comprehend flywheels by their KMS key."""
 
     RelatedIdsExpression = 'DataSecurityConfig.VolumeKmsKeyId'
+
 
 @ComprehendEntitiesDetectionJob.filter_registry.register('kms-key')
 @ComprehendSentimentDetectionJob.filter_registry.register('kms-key')

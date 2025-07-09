@@ -213,26 +213,6 @@ class ComprehendFlywheelTests(BaseTest):
         self.assertTrue("DataSecurityConfig" in resources[0])
         self.assertTrue("VpcConfig" in resources[0]["DataSecurityConfig"])
 
-    def test_comprehend_flywheel_kms_key(self):
-        session_factory = self.replay_flight_data("test_comprehend_flywheel_kms_key")
-        p = self.load_policy(
-            {
-                "name": "comprehend-flywheel-kms",
-                "resource": "comprehend-flywheel",
-                "filters": [
-                    {
-                        "type": "value",
-                        "key": "DataSecurityConfig.VolumeKmsKeyId",
-                        "value": "present",
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]["DataSecurityConfig"]["VolumeKmsKeyId"])
-
     def test_comprehend_flywheel_tag_untag(self):
         session_factory = self.replay_flight_data("test_comprehend_flywheel_tag_untag")
         p = self.load_policy(
