@@ -251,6 +251,24 @@ class ComprehendFlywheelTests(BaseTest):
         tags = client.list_tags_for_resource(ResourceArn=arn)
         self.assertEqual(len(tags.get("Tags", [])), 0)
 
+    def test_comprehend_flywheel_kms_key(self):
+        session_factory = self.replay_flight_data("test_comprehend_flywheel_kms_key")
+        p = self.load_policy(
+            {
+                "name": "comprehend-flywheel-kms-check",
+                "resource": "comprehend-flywheel",
+                "filters": [{
+                    'type': 'kms-key',
+                    'key': 'c7n:AliasName',
+                    'value': 'alias/comprehend-test-key'
+                }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]["DataSecurityConfig"]["VolumeKmsKeyId"])
+
 # Job Tests
 
 

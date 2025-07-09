@@ -5,10 +5,7 @@
         "ResourceTagMappingList": [
             {
                 "ResourceARN": "arn:aws:comprehend:us-east-1:644160558196:flywheel/TestFlywheelVPC",
-                "Tags": [{
-                        "Key": "ASV",
-                        "Value": "PolicyTestASV"
-                    }]
+                "Tags": []
             }
         ],
         "ResponseMetadata": {}
