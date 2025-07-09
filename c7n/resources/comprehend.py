@@ -310,7 +310,6 @@ class ComprehendModelCrossAccountAccessFilter(CrossAccountAccessFilter):
             ResourceArn=arn,
             ignore_err_codes=(
                 'ResourceNotFoundException',
-                'PolicyNotFoundException',
             ),
         )
 

@@ -60,25 +60,25 @@ ResourceMap = {
   "aws.codepipeline": "c7n.resources.code.CodeDeployPipeline",
   "aws.composite-alarm": "c7n.resources.cw.CompositeAlarm",
   "aws.comprehend-document-classification-job":
-  "c7n.resources.comprehend.ComprehendDocumentClassificationJob",
+    "c7n.resources.comprehend.ComprehendDocumentClassificationJob",
   "aws.comprehend-document-classifier":
-  "c7n.resources.comprehend.ComprehendDocumentClassifier",
+    "c7n.resources.comprehend.ComprehendDocumentClassifier",
   "aws.comprehend-dominant-language-detection-job":
-  "c7n.resources.comprehend.ComprehendDominantLanguageDetectionJob",
+    "c7n.resources.comprehend.ComprehendDominantLanguageDetectionJob",
   "aws.comprehend-endpoint": "c7n.resources.comprehend.ComprehendEndpoint",
   "aws.comprehend-entities-detection-job":
-  "c7n.resources.comprehend.ComprehendEntitiesDetectionJob",
+   "c7n.resources.comprehend.ComprehendEntitiesDetectionJob",
   "aws.comprehend-entity-recognizer": "c7n.resources.comprehend.ComprehendEntityRecognizer",
   "aws.comprehend-events-detection-job": "c7n.resources.comprehend.ComprehendEventsDetectionJob",
   "aws.comprehend-flywheel": "c7n.resources.comprehend.ComprehendFlywheel",
   "aws.comprehend-key-phrases-detection-job":
   "c7n.resources.comprehend.ComprehendKeyPhrasesDetectionJob",
   "aws.comprehend-pii-entities-detection-job":
-  "c7n.resources.comprehend.ComprehendPiiEntitiesDetectionJob",
+    "c7n.resources.comprehend.ComprehendPiiEntitiesDetectionJob",
   "aws.comprehend-sentiment-detection-job":
-  "c7n.resources.comprehend.ComprehendSentimentDetectionJob",
+    "c7n.resources.comprehend.ComprehendSentimentDetectionJob",
   "aws.comprehend-targeted-sentiment-detection-job":
-  "c7n.resources.comprehend.ComprehendTargetedSentimentDetectionJob",
+    "c7n.resources.comprehend.ComprehendTargetedSentimentDetectionJob",
   "aws.comprehend-topics-detection-job":
     "c7n.resources.comprehend.ComprehendTopicsDetectionJob",
   "aws.config-recorder": "c7n.resources.config.ConfigRecorder",
