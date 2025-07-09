@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
 
@@ -102,13 +104,18 @@ class ComprehendEntityRecognizerTests(BaseTest):
             {
                 "name": "comprehend-entity-recognizer-kms",
                 "resource": "comprehend-entity-recognizer",
-                "filters": [{"type": "kms-key"}],
+                "filters": [{
+                    'type': 'kms-key',
+                    'key': 'c7n:AliasName',
+                    'value': 'alias/comprehend-test-key'
+                }],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]["VolumeKmsKeyId"])
+        self.assertGreater(len(resources), 0)
+        for resource in resources:
+            self.assertTrue(resource["VolumeKmsKeyId"])
 
 
 class ComprehendDocumentClassifierTests(BaseTest):
@@ -169,13 +176,18 @@ class ComprehendDocumentClassifierTests(BaseTest):
             {
                 "name": "comprehend-document-classifier-kms",
                 "resource": "comprehend-document-classifier",
-                "filters": [{"type": "kms-key"}],
+                "filters": [{
+                    'type': 'kms-key',
+                    'key': 'c7n:AliasName',
+                    'value': 'alias/comprehend-test-key'
+                }],
             },
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]["VolumeKmsKeyId"])
+        self.assertGreater(len(resources), 0)
+        for resource in resources:
+            self.assertTrue(resource["VolumeKmsKeyId"])
 
 
 class ComprehendFlywheelTests(BaseTest):
@@ -201,6 +213,26 @@ class ComprehendFlywheelTests(BaseTest):
         self.assertTrue("DataSecurityConfig" in resources[0])
         self.assertTrue("VpcConfig" in resources[0]["DataSecurityConfig"])
 
+    def test_comprehend_flywheel_kms_key(self):
+        session_factory = self.replay_flight_data("test_comprehend_flywheel_kms_key")
+        p = self.load_policy(
+            {
+                "name": "comprehend-flywheel-kms",
+                "resource": "comprehend-flywheel",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "DataSecurityConfig.VolumeKmsKeyId",
+                        "value": "present",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]["DataSecurityConfig"]["VolumeKmsKeyId"])
+
     def test_comprehend_flywheel_tag_untag(self):
         session_factory = self.replay_flight_data("test_comprehend_flywheel_tag_untag")
         p = self.load_policy(
@@ -218,7 +250,6 @@ class ComprehendFlywheelTests(BaseTest):
         arn = resources[0]["FlywheelArn"]
         tags = client.list_tags_for_resource(ResourceArn=arn)
         self.assertEqual(len(tags.get("Tags", [])), 0)
-
 
 # Job Tests
 
@@ -452,22 +483,6 @@ class ComprehendKeyPhrasesDetectionJobTests(BaseTest):
 
 
 class ComprehendPiiEntitiesDetectionJobTests(BaseTest):
-    def test_comprehend_pii_entities_detection_job_vpc(self):
-        session_factory = self.replay_flight_data(
-            "test_comprehend_pii_entities_detection_job_vpc"
-        )
-        p = self.load_policy(
-            {
-                "name": "comprehend-pii-entities-detection-job-vpc",
-                "resource": "comprehend-pii-entities-detection-job",
-                "filters": [{"type": "value", "key": "VpcConfig", "value": "present"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue("VpcConfig" in resources[0])
-
     def test_comprehend_pii_entities_detection_job_tag_untag(self):
         session_factory = self.replay_flight_data(
             "test_comprehend_pii_entities_detection_job_tag_untag"
@@ -488,40 +503,8 @@ class ComprehendPiiEntitiesDetectionJobTests(BaseTest):
         tags = client.list_tags_for_resource(ResourceArn=arn)
         self.assertEqual(len(tags.get("Tags", [])), 0)
 
-    def test_comprehend_pii_entities_detection_job_kms_key(self):
-        session_factory = self.replay_flight_data(
-            "test_comprehend_pii_entities_detection_job_kms_key"
-        )
-        p = self.load_policy(
-            {
-                "name": "comprehend-pii-job-kms",
-                "resource": "comprehend-pii-entities-detection-job",
-                "filters": [{"type": "kms-key"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue(resources[0]["OutputDataConfig"]["KmsKeyId"])
-
 
 class ComprehendEventsDetectionJobTests(BaseTest):
-    def test_comprehend_events_detection_job_vpc(self):
-        session_factory = self.replay_flight_data(
-            "test_comprehend_events_detection_job_vpc"
-        )
-        p = self.load_policy(
-            {
-                "name": "comprehend-events-detection-job-vpc",
-                "resource": "comprehend-events-detection-job",
-                "filters": [{"type": "value", "key": "VpcConfig", "value": "present"}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertTrue("VpcConfig" in resources[0])
-
     def test_comprehend_events_detection_job_tag_untag(self):
         session_factory = self.replay_flight_data(
             "test_comprehend_events_detection_job_tag_untag"

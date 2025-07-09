@@ -116,12 +116,6 @@ class ComprehendSentimentDetectionJob(QueryResourceManager):
             'SentimentDetectionJobPropertiesList',
             None,
         )
-        detail_spec = (
-            'describe_sentiment_detection_job',
-            'JobId',
-            'JobId',
-            'SentimentDetectionJobProperties',
-        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
@@ -144,12 +138,6 @@ class ComprehendDocumentClassificationJob(QueryResourceManager):
             'list_document_classification_jobs',
             'DocumentClassificationJobPropertiesList',
             None,
-        )
-        detail_spec = (
-            'describe_document_classification_job',
-            'JobId',
-            'JobId',
-            'DocumentClassificationJobProperties',
         )
         arn = 'JobArn'
         id = 'JobId'
@@ -174,12 +162,6 @@ class ComprehendTopicsDetectionJob(QueryResourceManager):
             'TopicsDetectionJobPropertiesList',
             None,
         )
-        detail_spec = (
-            'describe_topics_detection_job',
-            'JobId',
-            'JobId',
-            'TopicsDetectionJobProperties',
-        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
@@ -202,12 +184,6 @@ class ComprehendDominantLanguageDetectionJob(QueryResourceManager):
             'list_dominant_language_detection_jobs',
             'DominantLanguageDetectionJobPropertiesList',
             None,
-        )
-        detail_spec = (
-            'describe_dominant_language_detection_job',
-            'JobId',
-            'JobId',
-            'DominantLanguageDetectionJobProperties',
         )
         arn = 'JobArn'
         id = 'JobId'
@@ -232,12 +208,6 @@ class ComprehendKeyPhrasesDetectionJob(QueryResourceManager):
             'KeyPhrasesDetectionJobPropertiesList',
             None,
         )
-        detail_spec = (
-            'describe_key_phrases_detection_job',
-            'JobId',
-            'JobId',
-            'KeyPhrasesDetectionJobProperties',
-        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
@@ -260,12 +230,6 @@ class ComprehendPiiEntitiesDetectionJob(QueryResourceManager):
             'list_pii_entities_detection_jobs',
             'PiiEntitiesDetectionJobPropertiesList',
             None,
-        )
-        detail_spec = (
-            'describe_pii_entities_detection_job',
-            'JobId',
-            'JobId',
-            'PiiEntitiesDetectionJobProperties',
         )
         arn = 'JobArn'
         id = 'JobId'
@@ -290,12 +254,6 @@ class ComprehendEventsDetectionJob(QueryResourceManager):
             'EventsDetectionJobPropertiesList',
             None,
         )
-        detail_spec = (
-            'describe_events_detection_job',
-            'JobId',
-            'JobId',
-            'EventsDetectionJobProperties',
-        )
         arn = 'JobArn'
         id = 'JobId'
         name = 'JobName'
@@ -318,12 +276,6 @@ class ComprehendTargetedSentimentDetectionJob(QueryResourceManager):
             'list_targeted_sentiment_detection_jobs',
             'TargetedSentimentDetectionJobPropertiesList',
             None,
-        )
-        detail_spec = (
-            'describe_targeted_sentiment_detection_job',
-            'JobId',
-            'JobId',
-            'TargetedSentimentDetectionJobProperties',
         )
         arn = 'JobArn'
         id = 'JobId'
