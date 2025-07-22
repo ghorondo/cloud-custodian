@@ -151,6 +151,7 @@ class ConnectAnalyticsAssociation(QueryResourceManager):
         service = 'connect'
         arn = id = 'AssociationId'
         name = 'DataSetId'
+        enum_spec = ('list_instances', 'InstanceSummaryList', None)
     permissions = (
         'connect:ListInstances',
         'connect:ListAnalyticsDataAssociations',
