@@ -182,7 +182,7 @@ class ConnectAssociationCrossAccountFilter(CrossAccountAccessFilter):
         whitelist={'type': 'array', 'items': {'type': 'string'}},
         whitelist_from=ValuesFrom.schema)
 
-    permissions = ()
+    permissions = ('connect:ListAnalyticsDataAssociations',)
 
     def process(self, resources, event=None):
         approved_accounts = self.get_accounts()
