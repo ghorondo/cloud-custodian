@@ -151,6 +151,10 @@ class ConnectAnalyticsAssociation(QueryResourceManager):
         service = 'connect'
         arn = id = 'AssociationId'
         name = 'DataSetId'
+    permissions = (
+        'connect:ListInstances',
+        'connect:ListAnalyticsDataAssociations',
+    )
 
     def resources(self, query=None):
         """
