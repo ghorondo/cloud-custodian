@@ -55,11 +55,17 @@ class ConnectTest(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        client = session_factory().client('connect')
+        results = []
+        for r in resources:
+            results.append(
+                session_factory().client('connect').describe_instance_attribute(
+                    InstanceId=r["Id"],
+                    AttributeType=r["c7n:InstanceAttribute"]["Attribute"]["AttributeType"])
+            )
+
+        self.assertEqual(results[0]["Attribute"]["AttributeType"], "CONTACT_LENS")
+        self.assertEqual(results[0]["Attribute"]["Value"], "true")
         self.assertEqual(len(resources), 1)
-        attr = client.describe_instance_attribute(
-            InstanceId=resources[0]["Id"], AttributeType="CONTACT_LENS")
-        self.assertEqual(attr["Attribute"]["Value"], "true")
 
     def test_connect_set_attributes_false(self):
         session_factory = self.replay_flight_data("test_connect_set_attributes_false")
@@ -82,15 +88,19 @@ class ConnectTest(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        client = session_factory().client('connect')
+        results = []
+        for r in resources:
+            results.append(
+                session_factory().client('connect').describe_instance_attribute(
+                    InstanceId=r["Id"],
+                    AttributeType=r["c7n:InstanceAttribute"]["Attribute"]["AttributeType"])
+            )
+        self.assertEqual(results[0]["Attribute"]["AttributeType"], "CONTACT_LENS")
+        self.assertEqual(results[0]["Attribute"]["Value"], "false")
         self.assertEqual(len(resources), 1)
-        attr = client.describe_instance_attribute(
-            InstanceId=resources[0]["Id"], AttributeType="CONTACT_LENS")
-        self.assertEqual(attr["Attribute"]["Value"], "false")
 
 
 class ConnectCampaignTest(BaseTest):
-
     def test_connect_campaign_query(self):
         session_factory = self.replay_flight_data("test_connect_campaign_query")
         p = self.load_policy(
@@ -106,7 +116,7 @@ class ConnectCampaignTest(BaseTest):
         session_factory = self.replay_flight_data("test_connect_campaign_instance_config_filter")
         p = self.load_policy(
             {
-                "name": "connect-campaign-instance-config-test",
+                "name": "connect-instance-attribute-test",
                 "resource": "connect-campaign",
                 'filters': [
                     {
@@ -123,7 +133,7 @@ class ConnectCampaignTest(BaseTest):
         session_factory = self.replay_flight_data("test_connect_campaign_kms_filter")
         p = self.load_policy(
             {
-                "name": "connect-campaign-kms-filter-test",
+                "name": "connect-instance-attribute-test",
                 "resource": "connect-campaign",
                 'filters': [
                     {
