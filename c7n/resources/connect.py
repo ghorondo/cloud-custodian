@@ -2,10 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.filters import ValueFilter, Filter
+from c7n.filters import ValueFilter
 from c7n.utils import local_session, type_schema
 from c7n.actions import Action
 from c7n.filters.kms import KmsRelatedFilter
+from c7n.filters import CrossAccountAccessFilter
+from c7n.resolver import ValuesFrom
 
 
 @resources.register('connect-instance')
@@ -166,18 +168,28 @@ class ConnectAnalyticsAssociation(QueryResourceManager):
 
 
 @ConnectAnalyticsAssociation.filter_registry.register('cross-account')
-class ConnectAssociationCrossAccountFilter(Filter):
-    """Flags all Connect analytics associations that target an external account.
+class ConnectAssociationCrossAccountFilter(CrossAccountAccessFilter):
     """
-    schema = type_schema('cross-account')
+    Flags associations that target an external, non-whitelisted account.
+    """
+    schema = type_schema(
+        'cross-account',
+        whitelist={'type': 'array', 'items': {'type': 'string'}},
+        whitelist_from=ValuesFrom.schema)
+
     permissions = ()
 
     def process(self, resources, event=None):
-        current_account_id = self.manager.account_id
+        approved_accounts = self.get_accounts()
         results = []
+
         for r in resources:
             target_account = r.get('TargetAccountId')
-            if target_account and target_account != current_account_id:
-                r['c7n:CurrentAccountId'] = current_account_id
+            if not target_account:
+                continue
+
+            if target_account not in approved_accounts:
+                r['c7n:CrossAccountViolations'] = [target_account]
                 results.append(r)
+
         return results
