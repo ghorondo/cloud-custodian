@@ -143,10 +143,6 @@ class ConnectCampaignKmsFilter(KmsRelatedFilter):
 
 @resources.register('connect-analytics-association')
 class ConnectAnalyticsAssociation(QueryResourceManager):
-    """Resource manager for Connect Analytics Data Associations.
-
-    """
-
     class resource_type(TypeInfo):
         service = 'connect'
         arn = id = 'AssociationId'
