@@ -170,9 +170,6 @@ class ConnectAnalyticsAssociation(QueryResourceManager):
 
 @ConnectAnalyticsAssociation.filter_registry.register('cross-account')
 class ConnectAssociationCrossAccountFilter(CrossAccountAccessFilter):
-    """
-    Flags associations that target an external, non-whitelisted account.
-    """
     schema = type_schema(
         'cross-account',
         whitelist={'type': 'array', 'items': {'type': 'string'}},
