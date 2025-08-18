@@ -177,7 +177,7 @@ jobs:
             make test-coverage COVERAGE_TYPE=term
             uv run coverage xml
           else
-            uv run pytest tests/
+            make test
           fi
 
       - name: Upload Code Coverage

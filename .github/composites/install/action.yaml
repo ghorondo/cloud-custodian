@@ -29,7 +29,7 @@ runs:
       id: cache
       with:
         path: .venv
-        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}
+        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}-v2
 
     - name: Update PATH
       shell: bash
@@ -60,13 +60,16 @@ runs:
     - name: Install
       if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
       shell: bash
+      env:
+        CHECK_VENV: ${{ steps.cache_check.outputs.venv }}
+        CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
       run: |
-        uv sync --all-packages --locked \
-          --group dev \
-          --group test \
-          --group addons \
-          --group lint \
-          --extra aws --extra gcp --extra azure
+        echo "check venv $CHECK_VENV"
+        echo "cache hit $CACHE_HIT"
+        if [ -d ".venv" ]; then
+          mv .venv .venv-old
+        fi
+        make install
 
     - name: Output UV Version
       shell: bash
