@@ -63,6 +63,7 @@ runs:
       run: |
         uv sync --all-packages --locked \
           --group dev \
+          --group test \
           --group addons \
           --group lint \
           --extra aws --extra gcp --extra azure
