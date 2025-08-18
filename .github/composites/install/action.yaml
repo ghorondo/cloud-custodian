@@ -60,16 +60,12 @@ runs:
     - name: Install
       if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
       shell: bash
-      env:
-        CHECK_VENV: ${{ steps.cache_check.outputs.venv }}
-        CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
       run: |
-        echo "check venv $CHECK_VENV"
-        echo "cache hit $CACHE_HIT"
-        if [ -d ".venv" ]; then
-          mv .venv .venv-old
-        fi
-        make install
+        uv sync --all-packages --locked \
+          --group dev \
+          --group addons \
+          --group lint \
+          --extra aws --extra gcp --extra azure
 
     - name: Output UV Version
       shell: bash
