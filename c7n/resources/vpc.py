@@ -3437,16 +3437,14 @@ class ResolverQueryLoggingFilter(Filter):
                 for config in page.get('ResolverQueryLogConfigs', []):
                     log_configs[config['Id']] = config
 
-        results = []
         for r in resources:
             association = associations.get(r['VpcId'])
-            has_logging = association is not None
+            if association:
+                r[self.annotation_key] = log_configs.get(
+                    association['ResolverQueryLogConfigId'], {}
+                )
 
-            if has_logging == target_state:
-                if has_logging:
-                    r[self.annotation_key] = log_configs.get(
-                        association['ResolverQueryLogConfigId'], {}
-                    )
-                results.append(r)
-
-        return results
+        return [
+            r for r in resources
+            if (self.annotation_key in r) == target_state
+        ]
