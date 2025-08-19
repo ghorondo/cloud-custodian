@@ -3391,8 +3391,8 @@ class ResolverQueryLoggingFilter(Filter):
     This filter checks if VPCs have Route 53 Resolver query logging
     enabled by checking for an association to a query logging config.
 
-    It annotates the VPC with the full association and config details,
-    allowing for addtional filtering with a `value` filter.
+    It annotates the VPC with the full config details, allowing for
+    additional filtering with a `value` filter.
 
     :example:
 
@@ -3444,11 +3444,9 @@ class ResolverQueryLoggingFilter(Filter):
 
             if has_logging == target_state:
                 if has_logging:
-                    config = log_configs.get(association['ResolverQueryLogConfigId'], {})
-                    r[self.annotation_key] = {
-                        'association': association,
-                        'config': config
-                    }
+                    r[self.annotation_key] = log_configs.get(
+                        association['ResolverQueryLogConfigId'], {}
+                    )
                 results.append(r)
 
         return results
