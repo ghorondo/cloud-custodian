@@ -2,11 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, ChildResourceManager
-from c7n.filters import ValueFilter, CrossAccountAccessFilter
+from c7n.filters import ValueFilter
 from c7n.utils import local_session, type_schema
 from c7n.actions import Action
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.resolver import ValuesFrom
 
 
 @resources.register('connect-instance')
@@ -145,40 +144,14 @@ class ConnectCampaignKmsFilter(KmsRelatedFilter):
 class ConnectAnalyticsAssociation(ChildResourceManager):
     """Resource manager for Connect Analytics Data Associations.
     """
-
     class resource_type(TypeInfo):
         service = 'connect'
         parent_spec = ('connect-instance', 'InstanceId', None)
         enum_spec = ('list_analytics_data_associations', 'Results', None)
-        arn = id = 'AssociationId'
+        id = 'AssociationId'
         name = 'DataSetId'
 
     permissions = (
         'connect:ListInstances',
         'connect:ListAnalyticsDataAssociations',
     )
-
-
-@ConnectAnalyticsAssociation.filter_registry.register('cross-account')
-class ConnectAssociationCrossAccountFilter(CrossAccountAccessFilter):
-    schema = type_schema(
-        'cross-account',
-        whitelist={'type': 'array', 'items': {'type': 'string'}},
-        whitelist_from=ValuesFrom.schema)
-
-    permissions = ('connect:ListAnalyticsDataAssociations',)
-
-    def process(self, resources, event=None):
-        approved_accounts = self.get_accounts()
-        results = []
-
-        for r in resources:
-            target_account = r.get('TargetAccountId')
-            if not target_account:
-                continue
-
-            if target_account not in approved_accounts:
-                r['c7n:CrossAccountViolations'] = [target_account]
-                results.append(r)
-
-        return results
