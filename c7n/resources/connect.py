@@ -151,7 +151,7 @@ class ConnectAnalyticsAssociation(ChildResourceManager):
         enum_spec = ('list_analytics_data_associations', 'Results', None)
         id = 'AssociationId'
         name = 'DataSetId'
-        arn_type = 'analytics-data-association'
+        arn_type = 'connect-analytics-association'
 
     permissions = (
         'connect:ListInstances',
