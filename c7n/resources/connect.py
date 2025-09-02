@@ -144,12 +144,14 @@ class ConnectCampaignKmsFilter(KmsRelatedFilter):
 class ConnectAnalyticsAssociation(ChildResourceManager):
     """Resource manager for Connect Analytics Data Associations.
     """
+
     class resource_type(TypeInfo):
         service = 'connect'
         parent_spec = ('connect-instance', 'InstanceId', None)
         enum_spec = ('list_analytics_data_associations', 'Results', None)
         id = 'AssociationId'
         name = 'DataSetId'
+        arn_type = 'analytics-data-association'
 
     permissions = (
         'connect:ListInstances',
