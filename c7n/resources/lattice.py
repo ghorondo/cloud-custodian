@@ -132,7 +132,9 @@ class AccessLogsFilter(Filter):
         'access-logs',
         enabled={'type': 'boolean', 'default': True},
         destination_type={'type': 'string', 'enum': ['s3', 'cloudwatch', 'firehose']},
-        log_types={'type': 'array', 'items': {'type': 'string', 'enum': ['SERVICE', 'RESOURCE']}}
+        log_types={'type': 'array', 'items': {'type': 'string', 'enum': ['SERVICE', 'RESOURCE']}},
+        check_all_types={'type': 'boolean', 'default': True}
+
     )
     permissions = ('vpc-lattice:ListAccessLogSubscriptions',)
 
