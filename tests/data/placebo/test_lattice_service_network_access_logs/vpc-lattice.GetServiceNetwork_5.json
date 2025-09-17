@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-092f7a594a03e7eba",
+        "authType": "AWS_IAM",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 17,
+            "second": 49,
+            "microsecond": 166000
+        },
+        "id": "sn-092f7a594a03e7eba",
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 17,
+            "second": 49,
+            "microsecond": 166000
+        },
+        "name": "compliant-iam-network",
+        "numberOfAssociatedServices": 0,
+        "numberOfAssociatedVPCs": 0,
+        "sharingConfig": {
+            "enabled": true
+        }
+    }
+}

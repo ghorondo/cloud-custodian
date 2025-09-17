@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-070d9e8cc80e37098",
+        "authType": "AWS_IAM",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 17,
+            "minute": 44,
+            "second": 20,
+            "microsecond": 740000
+        },
+        "id": "sn-070d9e8cc80e37098",
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 18,
+            "minute": 55,
+            "second": 48,
+            "microsecond": 888000
+        },
+        "name": "network-with-external-access",
+        "numberOfAssociatedServices": 0,
+        "numberOfAssociatedVPCs": 0,
+        "sharingConfig": {
+            "enabled": true
+        }
+    }
+}

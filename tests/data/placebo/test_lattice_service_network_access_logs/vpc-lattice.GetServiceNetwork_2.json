@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "arn": "arn:aws:vpc-lattice:us-east-1:644160558196:servicenetwork/sn-0641bb2a478d9d77b",
+        "authType": "NONE",
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 17,
+            "second": 9,
+            "microsecond": 375000
+        },
+        "id": "sn-0641bb2a478d9d77b",
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 9,
+            "day": 16,
+            "hour": 20,
+            "minute": 17,
+            "second": 9,
+            "microsecond": 375000
+        },
+        "name": "network-partial-logs",
+        "numberOfAssociatedServices": 0,
+        "numberOfAssociatedVPCs": 0,
+        "sharingConfig": {
+            "enabled": true
+        }
+    }
+}
