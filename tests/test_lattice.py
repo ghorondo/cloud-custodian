@@ -6,7 +6,7 @@ from .common import BaseTest
 class VPCLatticeServiceNetworkTests(BaseTest):
 
     def test_service_network_cross_account_policy(self):
-        session_factory = self.record_flight_data("test_lattice_network_cross_account")
+        session_factory = self.replay_flight_data("test_lattice_network_cross_account")
         p = self.load_policy(
             {
                 "name": "lattice-find-wildcard-access",
@@ -42,7 +42,7 @@ class VPCLatticeServiceNetworkTests(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_service_network_both_log_types_required(self):
-        session_factory = self.record_flight_data("test_lattice_network_both_logs")
+        session_factory = self.replay_flight_data("test_lattice_network_both_logs")
         p = self.load_policy(
             {
                 "name": "lattice-network-all-logs-check",
@@ -69,7 +69,7 @@ class VPCLatticeServiceNetworkTests(BaseTest):
         self.assertTrue(found, "Expected network-with-full-logging not found")
 
     def test_service_network_access_logs_disabled(self):
-        session_factory = self.record_flight_data("test_lattice_service_network_access_logs")
+        session_factory = self.replay_flight_data("test_lattice_service_network_access_logs")
         p = self.load_policy(
             {
                 "name": "lattice-network-logging-disabled",
@@ -87,7 +87,7 @@ class VPCLatticeServiceNetworkTests(BaseTest):
         self.assertTrue(found, "Expected network-no-logs not found")
 
     def test_service_network_partial_logs(self):
-        session_factory = self.record_flight_data("test_lattice_network_partial_logs")
+        session_factory = self.replay_flight_data("test_lattice_network_partial_logs")
         p = self.load_policy(
             {
                 "name": "lattice-network-partial-logs",
@@ -115,7 +115,7 @@ class VPCLatticeServiceNetworkTests(BaseTest):
 class VPCLatticeServiceTests(BaseTest):
 
     def test_service_cross_account_policy(self):
-        session_factory = self.record_flight_data("test_lattice_service_cross_account")
+        session_factory = self.replay_flight_data("test_lattice_service_cross_account")
         p = self.load_policy(
             {
                 "name": "lattice-service-approved-accounts",
@@ -154,7 +154,7 @@ class VPCLatticeServiceTests(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_service_access_logs_enabled(self):
-        session_factory = self.record_flight_data("test_lattice_service_access_logs_enabled")
+        session_factory = self.replay_flight_data("test_lattice_service_access_logs_enabled")
         p = self.load_policy(
             {
                 "name": "lattice-service-logs-enabled",
@@ -174,7 +174,7 @@ class VPCLatticeServiceTests(BaseTest):
         self.assertTrue(found, "Expected service-with-logs not found")
 
     def test_service_access_logs_disabled(self):
-        session_factory = self.record_flight_data("test_lattice_service_access_logs_disabled")
+        session_factory = self.replay_flight_data("test_lattice_service_access_logs_disabled")
         p = self.load_policy(
             {
                 "name": "lattice-service-logs-disabled",
@@ -194,7 +194,7 @@ class VPCLatticeServiceTests(BaseTest):
         self.assertTrue(found, "Expected service-no-logs not found")
 
     def test_service_access_logs_destination_type(self):
-        session_factory = self.record_flight_data("test_lattice_service_access_logs_dest")
+        session_factory = self.replay_flight_data("test_lattice_service_access_logs_dest")
         p = self.load_policy(
             {
                 "name": "lattice-service-logs-to-s3",
@@ -218,7 +218,7 @@ class VPCLatticeServiceTests(BaseTest):
         self.assertTrue(found, "Expected service-with-s3-logs not found")
 
     def test_service_auth_type_filter(self):
-        session_factory = self.record_flight_data("test_lattice_service_auth_type")
+        session_factory = self.replay_flight_data("test_lattice_service_auth_type")
         p = self.load_policy(
             {
                 "name": "lattice-service-no-auth",
@@ -243,7 +243,7 @@ class VPCLatticeServiceTests(BaseTest):
         self.assertTrue(found, "Expected service-no-auth not found")
 
     def test_service_auth_type_compliant(self):
-        session_factory = self.record_flight_data("test_lattice_service_auth_compliant")
+        session_factory = self.replay_flight_data("test_lattice_service_auth_compliant")
         p = self.load_policy(
             {
                 "name": "lattice-service-iam-auth-compliant",
