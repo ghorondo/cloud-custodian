@@ -1,9 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
-from botocore.exceptions import ClientError
 
-from c7n.filters import Filter, ValueFilter
+from c7n.filters import Filter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
@@ -18,13 +17,12 @@ class DescribeServiceNetwork(DescribeSource):
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('vpc-lattice')
         for r in resources:
-            try:
-                log_subs = client.list_access_log_subscriptions(resourceIdentifier=r['arn'])
-                r['c7n:AccessLogSubscriptions'] = log_subs.get('items', [])
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                    raise
-                r['c7n:AccessLogSubscriptions'] = []
+            log_subs = self.manager.retry(
+                client.list_access_log_subscriptions,
+                resourceIdentifier=r['arn'],
+                ignore_err_codes=('ResourceNotFoundException',)
+            )
+            r['c7n:AccessLogSubscriptions'] = log_subs.get('items', []) if log_subs else []
         return universal_augment(self.manager, resources)
 
 
@@ -35,18 +33,22 @@ class DescribeService(DescribeSource):
         client = local_session(self.manager.session_factory).client('vpc-lattice')
 
         for r in resources:
-            try:
-                details = client.get_service(serviceIdentifier=r['id'])
+            details = self.manager.retry(
+                client.get_service,
+                serviceIdentifier=r['id'],
+                ignore_err_codes=('ResourceNotFoundException',)
+            )
+            if details:
                 r.update(details)
-
-                log_subs = client.list_access_log_subscriptions(resourceIdentifier=r['arn'])
-                r['c7n:AccessLogSubscriptions'] = log_subs.get('items', [])
-            except ClientError as e:
-                if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                    raise
-
+            else:
                 r['authType'] = 'NONE'
-                r['c7n:AccessLogSubscriptions'] = []
+
+            log_subs = self.manager.retry(
+                client.list_access_log_subscriptions,
+                resourceIdentifier=r['arn'],
+                ignore_err_codes=('ResourceNotFoundException',)
+            )
+            r['c7n:AccessLogSubscriptions'] = log_subs.get('items', []) if log_subs else []
 
         return universal_augment(self.manager, resources)
 
@@ -97,30 +99,6 @@ class VPCLatticeService(QueryResourceManager):
     source_mapping = {
         'describe': DescribeService,
     }
-
-
-@VPCLatticeServiceNetwork.filter_registry.register('auth-type')
-@VPCLatticeService.filter_registry.register('auth-type')
-class AuthTypeFilter(ValueFilter):
-    """Filter VPC Lattice resources by authentication type"""
-
-    schema = type_schema(
-        'auth-type',
-        value={'type': 'string', 'enum': ['NONE', 'AWS_IAM']},
-        op={'type': 'string', 'enum': ['eq', 'ne', 'in', 'ni']},
-        required=['value']
-    )
-    permissions = ('vpc-lattice:GetService', 'vpc-lattice:GetServiceNetwork',)
-    annotation_key = 'authType'
-
-    def process(self, resources, event=None):
-        self.key = self.annotation_key
-        results = []
-        for r in resources:
-            r.setdefault(self.annotation_key, 'NONE')
-            if self.match(r):
-                results.append(r)
-        return results
 
 
 @VPCLatticeServiceNetwork.filter_registry.register('access-logs')
@@ -179,30 +157,25 @@ class LatticeResourcePolicyFilter(CrossAccountAccessFilter):
     policy_annotation = "c7n:Policy"
 
     def get_resource_policy(self, r):
-        if r.get(self.policy_annotation):
+        if self.policy_annotation in r:
             return r[self.policy_annotation]
 
         client = local_session(self.manager.session_factory).client('vpc-lattice')
 
-        try:
-            response = client.get_resource_policy(resourceArn=r['arn'])
-            if response.get('policy'):
-                policy = json.loads(response['policy'])
-                r[self.policy_annotation] = policy
-                return policy
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                self.manager.log.warning(f"Error getting resource policy for {r['arn']}: {e}")
+        for method, param in [
+            ('get_resource_policy', 'resourceArn'),
+            ('get_auth_policy', 'resourceIdentifier')
+        ]:
+            result = self.manager.retry(
+                getattr(client, method),
+                **{param: r['arn']},
+                ignore_err_codes=('ResourceNotFoundException',)
+            )
 
-        try:
-            response = client.get_auth_policy(resourceIdentifier=r['arn'])
-            if response.get('policy'):
-                policy = json.loads(response['policy'])
+            if result and result.get('policy'):
+                policy = json.loads(result['policy'])
                 r[self.policy_annotation] = policy
                 return policy
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                self.manager.log.warning(f"Error getting auth policy for {r['arn']}: {e}")
 
         return None
 
