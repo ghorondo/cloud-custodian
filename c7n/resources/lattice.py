@@ -58,7 +58,6 @@ class VPCLatticeServiceNetwork(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'vpc-lattice'
         enum_spec = ('list_service_networks', 'items', None)
-        detail_spec = ('get_service_network', 'id', 'serviceNetworkIdentifier', None)
         arn = 'arn'
         id = 'id'
         name = 'name'
@@ -83,7 +82,6 @@ class VPCLatticeService(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'vpc-lattice'
         enum_spec = ('list_services', 'items', None)
-        detail_spec = ('get_service', 'id', 'serviceIdentifier', None)
         arn = 'arn'
         id = 'id'
         name = 'name'
@@ -112,7 +110,7 @@ class AuthTypeFilter(ValueFilter):
         op={'type': 'string', 'enum': ['eq', 'ne', 'in', 'ni']},
         required=['value']
     )
-    permissions = ()
+    permissions = ('vpc-lattice:GetService', 'vpc-lattice:GetServiceNetwork',)
     annotation_key = 'authType'
 
     def process(self, resources, event=None):
@@ -136,7 +134,7 @@ class AccessLogsFilter(Filter):
         destination_type={'type': 'string', 'enum': ['s3', 'cloudwatch', 'firehose']},
         log_types={'type': 'array', 'items': {'type': 'string', 'enum': ['SERVICE', 'RESOURCE']}}
     )
-    permissions = ()
+    permissions = ('vpc-lattice:ListAccessLogSubscriptions',)
 
     def process(self, resources, event=None):
         enabled = self.data.get('enabled', True)
