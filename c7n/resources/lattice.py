@@ -9,6 +9,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.utils import local_session, type_schema
 from c7n import tags
+from c7n.tags import universal_augment
 
 
 class DescribeServiceNetwork(DescribeSource):
@@ -24,7 +25,7 @@ class DescribeServiceNetwork(DescribeSource):
                 if e.response['Error']['Code'] != 'ResourceNotFoundException':
                     raise
                 r['c7n:AccessLogSubscriptions'] = []
-        return resources
+        return universal_augment(self.manager, resources)
 
 
 class DescribeService(DescribeSource):
@@ -35,20 +36,19 @@ class DescribeService(DescribeSource):
 
         for r in resources:
             try:
-                # This call fetches the 'authType'
                 details = client.get_service(serviceIdentifier=r['id'])
-                r.update(details)  # Update the resource with full details
+                r.update(details)
 
-                # This call gets the log subscriptions
                 log_subs = client.list_access_log_subscriptions(resourceIdentifier=r['arn'])
                 r['c7n:AccessLogSubscriptions'] = log_subs.get('items', [])
             except ClientError as e:
                 if e.response['Error']['Code'] != 'ResourceNotFoundException':
                     raise
+
                 r['authType'] = 'NONE'
                 r['c7n:AccessLogSubscriptions'] = []
 
-        return resources
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('vpc-lattice-service-network')
@@ -136,7 +136,7 @@ class AccessLogsFilter(Filter):
         destination_type={'type': 'string', 'enum': ['s3', 'cloudwatch', 'firehose']},
         log_types={'type': 'array', 'items': {'type': 'string', 'enum': ['SERVICE', 'RESOURCE']}}
     )
-    permissions = ()  # Permissions are in augment
+    permissions = ()
 
     def process(self, resources, event=None):
         enabled = self.data.get('enabled', True)
@@ -207,7 +207,6 @@ class LatticeResourcePolicyFilter(CrossAccountAccessFilter):
         return None
 
 
-# Register standard tag filters for both resources
 VPCLatticeServiceNetwork.filter_registry.register('tag-count', tags.TagCountFilter)
 VPCLatticeServiceNetwork.filter_registry.register('marked-for-op', tags.TagActionFilter)
 VPCLatticeService.filter_registry.register('tag-count', tags.TagCountFilter)
