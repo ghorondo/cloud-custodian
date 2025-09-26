@@ -3437,6 +3437,7 @@ class ResolverQueryLoggingFilter(Filter):
                 for config in page.get('ResolverQueryLogConfigs', []):
                     log_configs[config['Id']] = config
 
+        results = []
         for r in resources:
             association = associations.get(r['VpcId'])
             if association:
@@ -3444,7 +3445,7 @@ class ResolverQueryLoggingFilter(Filter):
                     association['ResolverQueryLogConfigId'], {}
                 )
 
-        return [
-            r for r in resources
-            if (self.annotation_key in r) == target_state
-        ]
+            if (self.annotation_key in r) == target_state:
+                results.append(r)
+
+        return results
