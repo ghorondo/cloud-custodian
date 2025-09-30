@@ -12,22 +12,14 @@ from c7n.tags import universal_augment
 
 
 class DescribeServiceNetwork(DescribeSource):
-    """Augments Service Network resources with their log subscriptions."""
+    """Augments Service Network resources."""
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('vpc-lattice')
-        for r in resources:
-            log_subs = self.manager.retry(
-                client.list_access_log_subscriptions,
-                resourceIdentifier=r['arn'],
-                ignore_err_codes=('ResourceNotFoundException',)
-            )
-            r['c7n:AccessLogSubscriptions'] = log_subs.get('items', []) if log_subs else []
         return universal_augment(self.manager, resources)
 
 
 class DescribeService(DescribeSource):
-    """Augments Service resources with their log subscriptions."""
+    """Augments Service resources with auth type."""
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('vpc-lattice')
@@ -42,13 +34,6 @@ class DescribeService(DescribeSource):
                 r.update(details)
             else:
                 r['authType'] = 'NONE'
-
-            log_subs = self.manager.retry(
-                client.list_access_log_subscriptions,
-                resourceIdentifier=r['arn'],
-                ignore_err_codes=('ResourceNotFoundException',)
-            )
-            r['c7n:AccessLogSubscriptions'] = log_subs.get('items', []) if log_subs else []
 
         return universal_augment(self.manager, resources)
 
@@ -66,7 +51,6 @@ class VPCLatticeServiceNetwork(QueryResourceManager):
         universal_taggable = object()
         permissions_enum = ('vpc-lattice:ListServiceNetworks',)
         permissions_augment = (
-            'vpc-lattice:ListAccessLogSubscriptions',
             'vpc-lattice:ListTagsForResource',
             'vpc-lattice:GetResourcePolicy',
             'vpc-lattice:GetAuthPolicy'
@@ -90,7 +74,6 @@ class VPCLatticeService(QueryResourceManager):
         universal_taggable = object()
         permissions_enum = ('vpc-lattice:ListServices',)
         permissions_augment = (
-            'vpc-lattice:ListAccessLogSubscriptions',
             'vpc-lattice:ListTagsForResource',
             'vpc-lattice:GetResourcePolicy',
             'vpc-lattice:GetAuthPolicy'
@@ -112,7 +95,6 @@ class AccessLogsFilter(Filter):
         destination_type={'type': 'string', 'enum': ['s3', 'cloudwatch', 'firehose']},
         log_types={'type': 'array', 'items': {'type': 'string', 'enum': ['SERVICE', 'RESOURCE']}},
         check_all_types={'type': 'boolean', 'default': True}
-
     )
     permissions = ('vpc-lattice:ListAccessLogSubscriptions',)
 
@@ -121,14 +103,27 @@ class AccessLogsFilter(Filter):
         dest_type = self.data.get('destination_type')
         required_types = self.data.get('log_types')
         is_network = self.manager.resource_type.name == 'vpc-lattice-service-network'
+
+        check_types = None
+        if is_network:
+            check_types = set(required_types or ['SERVICE', 'RESOURCE'])
+
+        client = local_session(self.manager.session_factory).client('vpc-lattice')
         results = []
 
         for r in resources:
-            subs = r.get('c7n:AccessLogSubscriptions', [])
+            if 'c7n:AccessLogSubscriptions' not in r:
+                log_subs = self.manager.retry(
+                    client.list_access_log_subscriptions,
+                    resourceIdentifier=r['arn'],
+                    ignore_err_codes=('ResourceNotFoundException',)
+                )
+                r['c7n:AccessLogSubscriptions'] = log_subs.get('items', []) if log_subs else []
+
+            subs = r['c7n:AccessLogSubscriptions']
             has_logs = False
 
             if is_network:
-                check_types = set(required_types or ['SERVICE', 'RESOURCE'])
                 found_types = {s.get('serviceNetworkLogType') for s in subs}
                 has_logs = check_types.issubset(found_types)
             else:
@@ -136,9 +131,11 @@ class AccessLogsFilter(Filter):
 
             if dest_type and has_logs:
                 has_correct_dest = any(
-                (dest_type == 's3' and 'arn:aws:s3:::' in s.get('destinationArn', '')) or
-                (dest_type == 'cloudwatch' and 'arn:aws:logs:' in s.get('destinationArn', '')) or
-                (dest_type == 'firehose' and 'arn:aws:firehose:' in s.get('destinationArn', ''))
+                    (dest_type == 's3' and 'arn:aws:s3:::' in s.get('destinationArn', '')) or
+                    (dest_type == 'cloudwatch' and 'arn:aws:logs:'
+                     in s.get('destinationArn', '')) or
+                    (dest_type == 'firehose' and 'arn:aws:firehose:'
+                     in s.get('destinationArn', ''))
                     for s in subs
                 )
                 has_logs = has_correct_dest

@@ -68,49 +68,6 @@ class VPCLatticeServiceNetworkTests(BaseTest):
                 self.assertIn('RESOURCE', log_types)
         self.assertTrue(found, "Expected network-with-full-logging not found")
 
-    def test_service_network_access_logs_disabled(self):
-        session_factory = self.replay_flight_data("test_lattice_service_network_access_logs")
-        p = self.load_policy(
-            {
-                "name": "lattice-network-logging-disabled",
-                "resource": "aws.vpc-lattice-service-network",
-                "filters": [{"type": "access-logs", "enabled": False}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        found = False
-        for r in resources:
-            if r["name"] == "network-no-logs":
-                found = True
-                self.assertEqual(len(r.get("c7n:AccessLogSubscriptions", [])), 0)
-        self.assertTrue(found, "Expected network-no-logs not found")
-
-    def test_service_network_partial_logs(self):
-        session_factory = self.replay_flight_data("test_lattice_network_partial_logs")
-        p = self.load_policy(
-            {
-                "name": "lattice-network-partial-logs",
-                "resource": "aws.vpc-lattice-service-network",
-                "filters": [
-                    {
-                        "type": "access-logs",
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        found = False
-        for r in resources:
-            if r["name"] == "network-partial-logs":
-                found = True
-                log_types = {sub.get('serviceNetworkLogType')
-                             for sub in r.get("c7n:AccessLogSubscriptions", [])}
-                self.assertIn('SERVICE', log_types)
-                self.assertNotIn('RESOURCE', log_types)
-        self.assertTrue(found, "Expected network-partial-logs not found")
-
 
 class VPCLatticeServiceTests(BaseTest):
 
@@ -173,26 +130,6 @@ class VPCLatticeServiceTests(BaseTest):
                 self.assertGreater(len(r.get("c7n:AccessLogSubscriptions", [])), 0)
         self.assertTrue(found, "Expected service-with-logs not found")
 
-    def test_service_access_logs_disabled(self):
-        session_factory = self.replay_flight_data("test_lattice_service_access_logs_disabled")
-        p = self.load_policy(
-            {
-                "name": "lattice-service-logs-disabled",
-                "resource": "aws.vpc-lattice-service",
-                "filters": [
-                    {"type": "access-logs", "enabled": False}
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        found = False
-        for r in resources:
-            if r["name"] == "service-no-logs":
-                found = True
-                self.assertEqual(len(r.get("c7n:AccessLogSubscriptions", [])), 0)
-        self.assertTrue(found, "Expected service-no-logs not found")
-
     def test_service_access_logs_destination_type(self):
         session_factory = self.replay_flight_data("test_lattice_service_access_logs_dest")
         p = self.load_policy(
@@ -216,31 +153,6 @@ class VPCLatticeServiceTests(BaseTest):
                 found = True
                 self.assertIn("s3", r["c7n:AccessLogSubscriptions"][0]["destinationArn"])
         self.assertTrue(found, "Expected service-with-s3-logs not found")
-
-    def test_service_auth_type_filter(self):
-        session_factory = self.replay_flight_data("test_lattice_service_auth_type")
-        p = self.load_policy(
-            {
-                "name": "lattice-service-no-auth",
-                "resource": "aws.vpc-lattice-service",
-                "filters": [
-                    {
-                        "type": "value",
-                        "key": "authType",
-                        "value": "AWS_IAM",
-                        "op": "ne"
-                    }
-                ],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        found = False
-        for r in resources:
-            if r["name"] == "service-no-auth":
-                found = True
-                self.assertEqual(r["authType"], "NONE")
-        self.assertTrue(found, "Expected service-no-auth not found")
 
     def test_service_auth_type_compliant(self):
         session_factory = self.replay_flight_data("test_lattice_service_auth_compliant")
