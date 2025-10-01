@@ -38,6 +38,24 @@ class DescribeService(DescribeSource):
         return universal_augment(self.manager, resources)
 
 
+class DescribeTargetGroup(DescribeSource):
+    """Augments Target Group resources with details."""
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('vpc-lattice')
+
+        for r in resources:
+            details = self.manager.retry(
+                client.get_target_group,
+                targetGroupIdentifier=r['id'],
+                ignore_err_codes=('ResourceNotFoundException',)
+            )
+            if details:
+                r.update(details)
+
+        return universal_augment(self.manager, resources)
+
+
 @resources.register('vpc-lattice-service-network')
 class VPCLatticeServiceNetwork(QueryResourceManager):
     """VPC Lattice Service Network Resource"""
@@ -81,6 +99,28 @@ class VPCLatticeService(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeService,
+    }
+
+
+@resources.register('vpc-lattice-target-group')
+class VPCLatticeTargetGroup(QueryResourceManager):
+    """VPC Lattice Target Group Resource"""
+
+    class resource_type(TypeInfo):
+        service = 'vpc-lattice'
+        enum_spec = ('list_target_groups', 'items', None)
+        arn = 'arn'
+        id = 'id'
+        name = 'name'
+        universal_taggable = object()
+        permissions_enum = ('vpc-lattice:ListTargetGroups',)
+        permissions_augment = (
+            'vpc-lattice:GetTargetGroup',
+            'vpc-lattice:ListTagsForResource'
+        )
+
+    source_mapping = {
+        'describe': DescribeTargetGroup,
     }
 
 
@@ -131,9 +171,10 @@ class AccessLogsFilter(Filter):
 
             if dest_type and has_logs:
                 has_correct_dest = any(
-                    (dest_type == 's3' and 'arn:aws:s3:::' in s.get('destinationArn', '')) or
+                    (dest_type == 's3' and 'arn:aws:s3:::'
+                      in s.get('destinationArn', '')) or
                     (dest_type == 'cloudwatch' and 'arn:aws:logs:'
-                     in s.get('destinationArn', '')) or
+                      in s.get('destinationArn', '')) or
                     (dest_type == 'firehose' and 'arn:aws:firehose:'
                      in s.get('destinationArn', ''))
                     for s in subs
@@ -181,3 +222,5 @@ VPCLatticeServiceNetwork.filter_registry.register('tag-count', tags.TagCountFilt
 VPCLatticeServiceNetwork.filter_registry.register('marked-for-op', tags.TagActionFilter)
 VPCLatticeService.filter_registry.register('tag-count', tags.TagCountFilter)
 VPCLatticeService.filter_registry.register('marked-for-op', tags.TagActionFilter)
+VPCLatticeTargetGroup.filter_registry.register('tag-count', tags.TagCountFilter)
+VPCLatticeTargetGroup.filter_registry.register('marked-for-op', tags.TagActionFilter)

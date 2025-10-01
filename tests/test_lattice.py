@@ -177,3 +177,23 @@ class VPCLatticeServiceTests(BaseTest):
                 found = True
                 self.assertEqual(r["authType"], "AWS_IAM")
         self.assertTrue(found, "Expected compliant-service not found")
+
+
+class VPCLatticeTargetGroupTests(BaseTest):
+
+    def test_target_group_tag_untag(self):
+        session_factory = self.replay_flight_data("test_lattice_target_group_tag_untag")
+        p = self.load_policy(
+            {
+                "name": "lattice-target-group-untag",
+                "resource": "aws.vpc-lattice-target-group",
+                "filters": [
+                    {"name": "test-tagging-target-group"},
+                    {"tag:ASV": "PolicyTestASV"}
+                ],
+                "actions": [{"type": "remove-tag", "tags": ["ASV"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
