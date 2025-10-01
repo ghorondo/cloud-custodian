@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, ChildResourceManager
+from c7n.query import QueryResourceManager, TypeInfo
 from c7n.filters import ValueFilter
 from c7n.utils import local_session, type_schema
 from c7n.actions import Action
@@ -58,6 +58,51 @@ class ConnectInstanceAttributeFilter(ValueFilter):
                 r[self.annotation_key] = instance_attribute
 
             if self.match(r[self.annotation_key]):
+                results.append(r)
+
+        return results
+
+
+@Connect.filter_registry.register('analytics-association')
+class ConnectAnalyticsAssociationFilter(ValueFilter):
+    """
+    Filter Connect instances based on analytics data associations
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: connect-analytics-sharing
+            resource: connect-instance
+            filters:
+              - type: analytics-association
+                key: TargetAccountId
+                op: ne
+                value: "123456789012"
+          - name: check-association
+            resource: connect-instance
+            filters:
+              - type: analytics-association
+                key: DataSetId
+                value: present
+
+    """
+
+    schema = type_schema('analytics-association', rinherit=ValueFilter.schema)
+    permissions = ('connect:ListAnalyticsDataAssociations',)
+    annotation_key = 'c7n:AnalyticsAssociations'
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('connect')
+        results = []
+
+        for r in resources:
+            if self.annotation_key not in r:
+                r[self.annotation_key] = client.list_analytics_data_associations(
+                    InstanceId=r['Id']
+                ).get('Results', [])
+
+            if any(self.match(assoc) for assoc in r[self.annotation_key]):
                 results.append(r)
 
         return results
@@ -138,22 +183,3 @@ class ConnectCampaign(QueryResourceManager):
 @ConnectCampaign.filter_registry.register('kms-key')
 class ConnectCampaignKmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'connectInstanceConfig.encryptionConfig.keyArn'
-
-
-@resources.register('connect-analytics-association')
-class ConnectAnalyticsAssociation(ChildResourceManager):
-    """Resource manager for Connect Analytics Data Associations.
-    """
-
-    class resource_type(TypeInfo):
-        service = 'connect'
-        parent_spec = ('connect-instance', 'InstanceId', None)
-        enum_spec = ('list_analytics_data_associations', 'Results', None)
-        id = 'AssociationId'
-        name = 'DataSetId'
-        arn_type = 'connect-analytics-association'
-
-    permissions = (
-        'connect:ListInstances',
-        'connect:ListAnalyticsDataAssociations',
-    )
