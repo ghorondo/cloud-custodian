@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResourcePolicy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"TestPolicy\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"comprehend:ImportModel\",\"Resource\":\"arn:aws:comprehend:us-east-1:644160558196:entity-recognizer/TestVpcEntityRecognizer/version/10\"}]}",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 4,
+            "day": 15,
+            "hour": 10,
+            "minute": 25,
+            "second": 11,
+            "microsecond": 332000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2025,
+            "month": 4,
+            "day": 15,
+            "hour": 10,
+            "minute": 25,
+            "second": 11,
+            "microsecond": 332000
+        },
+        "PolicyRevisionId": "2b73f5f3f90ee8f70bc7c512974cd144",
+        "ResponseMetadata": {}
+    }
+}
