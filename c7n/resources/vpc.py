@@ -3421,19 +3421,19 @@ class ResolverQueryLoggingFilter(Filter):
         client = local_session(self.manager.session_factory).client('route53resolver')
         target_state = self.data.get('state', True)
 
+        vpc_ids = [r['VpcId'] for r in resources]
         associations = {}
         paginator = client.get_paginator('list_resolver_query_log_config_associations')
-        for page in paginator.paginate():
+        for page in paginator.paginate(Filters=[{'Name': 'ResourceId', 'Values': vpc_ids}]):
             for assoc in page.get('ResolverQueryLogConfigAssociations', []):
                 if assoc['Status'] in ['ACTIVE', 'CREATING']:
                     associations[assoc['ResourceId']] = assoc
 
         log_configs = {}
         if associations:
+            config_ids = list({a['ResolverQueryLogConfigId'] for a in associations.values()})
             paginator = client.get_paginator('list_resolver_query_log_configs')
-            config_ids_to_fetch = {a['ResolverQueryLogConfigId'] for a in associations.values()}
-            for page in paginator.paginate(
-                Filters=[{'Name': 'Id', 'Values': list(config_ids_to_fetch)}]):
+            for page in paginator.paginate(Filters=[{'Name': 'Id', 'Values': config_ids}]):
                 for config in page.get('ResolverQueryLogConfigs', []):
                     log_configs[config['Id']] = config
 
@@ -3444,7 +3444,6 @@ class ResolverQueryLoggingFilter(Filter):
                 r[self.annotation_key] = log_configs.get(
                     association['ResolverQueryLogConfigId'], {}
                 )
-
             if (self.annotation_key in r) == target_state:
                 results.append(r)
 
