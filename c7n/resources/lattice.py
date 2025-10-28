@@ -1,64 +1,20 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import json
 
 from c7n.filters import Filter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
+from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags
 from c7n.utils import local_session, type_schema
 from c7n import tags
-from c7n.tags import universal_augment
-
-
-class DescribeServiceNetwork(DescribeSource):
-    """Augments Service Network resources."""
-
-    def augment(self, resources):
-        return universal_augment(self.manager, resources)
-
-
-class DescribeService(DescribeSource):
-    """Augments Service resources with auth type."""
-
-    def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('vpc-lattice')
-
-        for r in resources:
-            details = self.manager.retry(
-                client.get_service,
-                serviceIdentifier=r['id'],
-                ignore_err_codes=('ResourceNotFoundException',)
-            )
-            if details:
-                r.update(details)
-            else:
-                r['authType'] = 'NONE'
-
-        return universal_augment(self.manager, resources)
-
-
-class DescribeTargetGroup(DescribeSource):
-    """Augments Target Group resources with details."""
-
-    def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('vpc-lattice')
-
-        for r in resources:
-            details = self.manager.retry(
-                client.get_target_group,
-                targetGroupIdentifier=r['id'],
-                ignore_err_codes=('ResourceNotFoundException',)
-            )
-            if details:
-                r.update(details)
-
-        return universal_augment(self.manager, resources)
 
 
 @resources.register('vpc-lattice-service-network')
 class VPCLatticeServiceNetwork(QueryResourceManager):
     """VPC Lattice Service Network Resource"""
+    source_mapping = {
+        'describe': DescribeWithResourceTags,
+    }
 
     class resource_type(TypeInfo):
         service = 'vpc-lattice'
@@ -68,47 +24,42 @@ class VPCLatticeServiceNetwork(QueryResourceManager):
         name = 'name'
         universal_taggable = object()
         permissions_enum = ('vpc-lattice:ListServiceNetworks',)
-        permissions_augment = (
-            'vpc-lattice:ListTagsForResource',
-            'vpc-lattice:GetResourcePolicy',
-            'vpc-lattice:GetAuthPolicy'
-        )
-
-    source_mapping = {
-        'describe': DescribeServiceNetwork,
-    }
+        permissions_augment = ('vpc-lattice:ListTagsForResource',)
 
 
 @resources.register('vpc-lattice-service')
 class VPCLatticeService(QueryResourceManager):
     """VPC Lattice Service Resource"""
+    source_mapping = {
+        'describe': DescribeWithResourceTags,
+    }
 
     class resource_type(TypeInfo):
         service = 'vpc-lattice'
         enum_spec = ('list_services', 'items', None)
+        detail_spec = ('get_service', 'serviceIdentifier', 'id', None)
         arn = 'arn'
         id = 'id'
         name = 'name'
         universal_taggable = object()
         permissions_enum = ('vpc-lattice:ListServices',)
         permissions_augment = (
-            'vpc-lattice:ListTagsForResource',
-            'vpc-lattice:GetResourcePolicy',
-            'vpc-lattice:GetAuthPolicy'
+            'vpc-lattice:GetService',
+            'vpc-lattice:ListTagsForResource'
         )
-
-    source_mapping = {
-        'describe': DescribeService,
-    }
 
 
 @resources.register('vpc-lattice-target-group')
 class VPCLatticeTargetGroup(QueryResourceManager):
     """VPC Lattice Target Group Resource"""
+    source_mapping = {
+        'describe': DescribeWithResourceTags,
+    }
 
     class resource_type(TypeInfo):
         service = 'vpc-lattice'
         enum_spec = ('list_target_groups', 'items', None)
+        detail_spec = ('get_target_group', 'targetGroupIdentifier', 'id', None)
         arn = 'arn'
         id = 'id'
         name = 'name'
@@ -118,10 +69,6 @@ class VPCLatticeTargetGroup(QueryResourceManager):
             'vpc-lattice:GetTargetGroup',
             'vpc-lattice:ListTagsForResource'
         )
-
-    source_mapping = {
-        'describe': DescribeTargetGroup,
-    }
 
 
 @VPCLatticeServiceNetwork.filter_registry.register('access-logs')
@@ -133,8 +80,7 @@ class AccessLogsFilter(Filter):
         'access-logs',
         enabled={'type': 'boolean', 'default': True},
         destination_type={'type': 'string', 'enum': ['s3', 'cloudwatch', 'firehose']},
-        log_types={'type': 'array', 'items': {'type': 'string', 'enum': ['SERVICE', 'RESOURCE']}},
-        check_all_types={'type': 'boolean', 'default': True}
+        log_types={'type': 'array', 'items': {'type': 'string', 'enum': ['SERVICE', 'RESOURCE']}}
     )
     permissions = ('vpc-lattice:ListAccessLogSubscriptions',)
 
@@ -211,9 +157,8 @@ class LatticeResourcePolicyFilter(CrossAccountAccessFilter):
             )
 
             if result and result.get('policy'):
-                policy = json.loads(result['policy'])
-                r[self.policy_annotation] = policy
-                return policy
+                r[self.policy_annotation] = result['policy']
+                return result['policy']
 
         return None
 
