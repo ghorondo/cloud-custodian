@@ -6,7 +6,6 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags
 from c7n.utils import local_session, type_schema
-from c7n import tags
 
 
 @resources.register('vpc-lattice-service-network')
@@ -161,11 +160,3 @@ class LatticeResourcePolicyFilter(CrossAccountAccessFilter):
                 return result['policy']
 
         return None
-
-
-VPCLatticeServiceNetwork.filter_registry.register('tag-count', tags.TagCountFilter)
-VPCLatticeServiceNetwork.filter_registry.register('marked-for-op', tags.TagActionFilter)
-VPCLatticeService.filter_registry.register('tag-count', tags.TagCountFilter)
-VPCLatticeService.filter_registry.register('marked-for-op', tags.TagActionFilter)
-VPCLatticeTargetGroup.filter_registry.register('tag-count', tags.TagCountFilter)
-VPCLatticeTargetGroup.filter_registry.register('marked-for-op', tags.TagActionFilter)
