@@ -3424,16 +3424,22 @@ class ResolverQueryLoggingFilter(Filter):
         vpc_ids = [r['VpcId'] for r in resources]
         associations = {}
         paginator = client.get_paginator('list_resolver_query_log_config_associations')
-        for page in paginator.paginate(Filters=[{'Name': 'ResourceId', 'Values': vpc_ids}]):
+        for page in paginator.paginate(
+            Filters=[
+                {'Name': 'ResourceId', 'Values': vpc_ids},
+                {'Name': 'Status', 'Values': ['ACTIVE', 'CREATING']}
+            ]
+        ):
             for assoc in page.get('ResolverQueryLogConfigAssociations', []):
-                if assoc['Status'] in ['ACTIVE', 'CREATING']:
-                    associations[assoc['ResourceId']] = assoc
+                associations[assoc['ResourceId']] = assoc
 
         log_configs = {}
         if associations:
             config_ids = list({a['ResolverQueryLogConfigId'] for a in associations.values()})
             paginator = client.get_paginator('list_resolver_query_log_configs')
-            for page in paginator.paginate(Filters=[{'Name': 'Id', 'Values': config_ids}]):
+            for page in paginator.paginate(
+                Filters=[{'Name': 'Id', 'Values': config_ids}]
+            ):
                 for config in page.get('ResolverQueryLogConfigs', []):
                     log_configs[config['Id']] = config
 
