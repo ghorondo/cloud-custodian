@@ -51,7 +51,7 @@ class VPCLatticeServiceNetworkTests(BaseTest):
                     {
                         "type": "access-logs",
                         "enabled": True,
-                        "log_types": ["SERVICE", "RESOURCE"]  # CHANGED: removed check_all_types
+                        "log_types": ["SERVICE", "RESOURCE"]
                     }
                 ],
             },
