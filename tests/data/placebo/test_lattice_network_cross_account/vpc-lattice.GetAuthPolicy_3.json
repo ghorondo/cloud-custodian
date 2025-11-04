@@ -2,6 +2,8 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
+        "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"vpc-lattice-svcs:*\",\"Resource\":\"*\"}]}",
+        "state": "Active",
         "createdAt": {
             "__class__": "datetime",
             "year": 2025,
@@ -21,8 +23,6 @@
             "minute": 34,
             "second": 1,
             "microsecond": 280000
-        },
-        "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"vpc-lattice-svcs:*\",\"Resource\":\"*\"}]}",
-        "state": "Active"
+        }
     }
 }

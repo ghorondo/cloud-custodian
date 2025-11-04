@@ -133,11 +133,11 @@ class AccessLogsFilter(Filter):
 
 @VPCLatticeServiceNetwork.filter_registry.register('cross-account')
 @VPCLatticeService.filter_registry.register('cross-account')
-class LatticeResourcePolicyFilter(CrossAccountAccessFilter):
-    """Filter VPC Lattice resources by resource or auth policy cross-account access."""
+class LatticeAuthPolicyFilter(CrossAccountAccessFilter):
+    """Filter VPC Lattice resources by cross-account access in auth policy."""
 
-    permissions = ('vpc-lattice:GetResourcePolicy', 'vpc-lattice:GetAuthPolicy',)
-    policy_annotation = "c7n:Policy"
+    permissions = ('vpc-lattice:GetAuthPolicy',)
+    policy_annotation = "c7n:AuthPolicy"
 
     def get_resource_policy(self, r):
         if self.policy_annotation in r:
@@ -145,18 +145,14 @@ class LatticeResourcePolicyFilter(CrossAccountAccessFilter):
 
         client = local_session(self.manager.session_factory).client('vpc-lattice')
 
-        for method, param in [
-            ('get_resource_policy', 'resourceArn'),
-            ('get_auth_policy', 'resourceIdentifier')
-        ]:
-            result = self.manager.retry(
-                getattr(client, method),
-                **{param: r['arn']},
-                ignore_err_codes=('ResourceNotFoundException',)
-            )
+        result = self.manager.retry(
+            client.get_auth_policy,
+            resourceIdentifier=r['arn'],
+            ignore_err_codes=('ResourceNotFoundException',)
+        )
 
-            if result and result.get('policy'):
-                r[self.policy_annotation] = result['policy']
-                return result['policy']
+        if result and result.get('policy'):
+            r[self.policy_annotation] = result['policy']
+            return result['policy']
 
         return None
