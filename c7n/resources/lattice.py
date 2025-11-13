@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
-from c7n.filters import Filter
+from c7n.filters import ValueFilter
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeWithResourceTags
@@ -72,63 +71,26 @@ class VPCLatticeTargetGroup(QueryResourceManager):
 
 @VPCLatticeServiceNetwork.filter_registry.register('access-logs')
 @VPCLatticeService.filter_registry.register('access-logs')
-class AccessLogsFilter(Filter):
-    """Filters VPC Lattice resources by access logging configuration."""
+class AccessLogsFilter(ValueFilter):
+    """Filter VPC Lattice resources by access log subscription configuration."""
 
-    schema = type_schema(
-        'access-logs',
-        enabled={'type': 'boolean', 'default': True},
-        destination_type={'type': 'string', 'enum': ['s3', 'cloudwatch', 'firehose']},
-        log_types={'type': 'array', 'items': {'type': 'string', 'enum': ['SERVICE', 'RESOURCE']}}
-    )
+    annotate = False
+    schema_alias = False
     permissions = ('vpc-lattice:ListAccessLogSubscriptions',)
+    schema = type_schema('access-logs', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
-        enabled = self.data.get('enabled', True)
-        dest_type = self.data.get('destination_type')
-        required_types = self.data.get('log_types')
-        is_network = self.manager.resource_type.name == 'vpc-lattice-service-network'
-
-        check_types = None
-        if is_network:
-            check_types = set(required_types or ['SERVICE', 'RESOURCE'])
-
         client = local_session(self.manager.session_factory).client('vpc-lattice')
-        results = []
-
         for r in resources:
-            if 'c7n:AccessLogSubscriptions' not in r:
+            if 'AccessLogSubscriptions' not in r:
                 log_subs = self.manager.retry(
                     client.list_access_log_subscriptions,
                     resourceIdentifier=r['arn'],
                     ignore_err_codes=('ResourceNotFoundException',)
                 )
-                r['c7n:AccessLogSubscriptions'] = log_subs.get('items', []) if log_subs else []
+                r['AccessLogSubscriptions'] = log_subs.get('items', []) if log_subs else []
 
-            subs = r['c7n:AccessLogSubscriptions']
-            has_logs = False
-
-            if is_network:
-                found_types = {s.get('serviceNetworkLogType') for s in subs}
-                has_logs = check_types.issubset(found_types)
-            else:
-                has_logs = len(subs) > 0
-
-            if dest_type and has_logs:
-                has_correct_dest = any(
-                    (dest_type == 's3' and 'arn:aws:s3:::'
-                      in s.get('destinationArn', '')) or
-                    (dest_type == 'cloudwatch' and 'arn:aws:logs:'
-                      in s.get('destinationArn', '')) or
-                    (dest_type == 'firehose' and 'arn:aws:firehose:'
-                     in s.get('destinationArn', ''))
-                    for s in subs
-                )
-                has_logs = has_correct_dest
-
-            if has_logs == enabled:
-                results.append(r)
-        return results
+        return super(AccessLogsFilter, self).process(resources, event)
 
 
 @VPCLatticeServiceNetwork.filter_registry.register('cross-account')
