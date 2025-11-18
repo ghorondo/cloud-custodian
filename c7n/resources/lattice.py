@@ -74,8 +74,7 @@ class VPCLatticeTargetGroup(QueryResourceManager):
 class AccessLogsFilter(ValueFilter):
     """Filter VPC Lattice resources by access log subscription configuration."""
 
-    annotate = False
-    schema_alias = False
+    annotate = True
     permissions = ('vpc-lattice:ListAccessLogSubscriptions',)
     schema = type_schema('access-logs', rinherit=ValueFilter.schema)
 
